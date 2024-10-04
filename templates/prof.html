@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f0f0;
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .dashboard {
+      width: 250px;
+      height: 100vh;
+      background-color: #333;
+      color: #fff; /* Text color for dashboard content */
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+      padding: 0;
+      display: block; /* Dashboard is visible by default */
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 1;
+    }
+
+    .dashboard.hide {
+      display: none; /* Hide the dashboard when toggled */
+    }
+
+    .dashboard-header {
+      background-color: #D5A84C; /* Changed to the gold color from hover */
+      height: 50px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      padding-top: 10px;
+      padding-left: 10px;
+      text-align: left;
+    }
+
+    .dashboard-header h2 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 0;
+      color: inherit;
+    }
+
+    .dashboard-content {
+      padding: 20px;
+    }
+
+    .dashboard-content ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .dashboard-content li {
+      padding: 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      display: flex;
+      align-items: center;
+    }
+
+    .dashboard-content li:last-child {
+      border-bottom: none;
+    }
+
+    .dashboard-content a {
+      color: inherit; /* Inherit the dashboard text color */
+      text-decoration: none;
+      flex: 1;
+    }
+
+    .dashboard-content a:hover {
+      color: #F00; /* Changed to red color as mentioned in the ano */
+    }
+
+    .navbar {
+      background-color: transparent;
+      border: none;
+      margin-top: auto;
+      padding: 0;
+    }
+
+    .navbar.nav-item {
+      margin: 0 10px;
+    }
+
+    .toggle-dashboard {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      z-index: 2;
+      background-color: #D5A84C;
+      color: #FFFFFF;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .courses {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+      margin: 20px 0;
+    }
+
+    .course-card {
+      width: 300px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-header {
+      background-size: cover;
+      background-position: center;
+      height: 120px;
+      position: relative;
+    }
+
+    .progress-indicator {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(255, 255, 255, 0.8);
+      padding: 5px 10px;
+      border-radius: 50px;
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    .card-body {
+      padding: 15px;
+      background-color: #fff;
+    }
+
+    .card-body h3 {
+      margin-top: 0;
+      font-size: 18px;
+      color: #333;
+    }
+
+    .card-body p {
+      color: #666;
+      font-size: 14px;
+    }
+
+    .info-btn {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: rgba(0, 0, 0, 0.5);
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 25px;
+      height: 25px;
+      font-size: 14px;
+    }
+
+    @media (max-width: 767.98px) {
+      .dashboard {
+        width: 100%;
+        height: 100vh;
+      }
+
+      .dashboard-header h2 {
+        font-size: 1.2rem;
+      }
+    }
+
+    @media (max-width: 575.98px) {
+      .dashboard {
+        width: 100%;
+        height: 100vh;
+      }
+
+      .dashboard-header h2 {
+        font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <button class="toggle-dashboard">Hide Dashboard</button> <div class="dashboard">
+    <div class="dashboard-header">
+      <h2>Dashboard</h2>
+    </div>
+    <div class="dashboard-content">
+      <ul>
+        <li><a href="#">Assignments</a></li>
+        <li><a href="#">Courses</a></li>
+        <li><a href="#">Enrollments</a></li>
+        <li><a href="#">Submissions</a></li>
+        <li><a href="{% url 'class:change_password' %}">Change Password</a></li>
+      </ul>
+      <nav class="navbar">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'class:logout' %}">Logout</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+
+  <div class="courses">
+    {% for foo in query %}
+      <div class="course-card">
+        <div class="card-header" style="background-image: url('background.jpg');">
+          <div class="progress-indicator">N/A</div>
+          <button class="info-btn">i</button>
+        </div>
+        <div class="card-body">
+          <h3><a href="{% url 'class:course_view' foo.course.id %}">{{ foo.course }}</a></h3>
+          <p>Class Code: {{ foo.course.code }}</p>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+  <script>
+    const toggleButton = document.querySelector('.toggle-dashboard');
+    const dashboard = document.querySelector('.dashboard');
+
+    toggleButton.addEventListener('click', () => {
+      dashboard.classList.toggle('hide');
+
+      // Update the button text depending on the dashboard state
+      if (dashboard.classList.contains('hide')) {
+        toggleButton.textContent = 'Show Dashboard';
+      } else {
+        toggleButton.textContent = 'Hide Dashboard';
+      }
+    });
+  </script>
+</body>
+</html>

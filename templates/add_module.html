@@ -1,0 +1,16 @@
+<!-- add_module.html -->
+{% extends 'form_style.html' %}
+
+{% block title %}Add Module{% endblock %}
+
+{% block content %}
+    <h1>Add Module</h1>
+
+    <div class="form-container">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form }}
+            <button type="submit" class="submit-btn">Submit</button>
+        </form>
+    </div>
+{% endblock %}

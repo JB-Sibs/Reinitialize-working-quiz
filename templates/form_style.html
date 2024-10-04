@@ -1,0 +1,75 @@
+<!-- base.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %} My Site {% endblock %}</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Header style */
+        h1 {
+            font-size: 2rem;
+            color: #890604; /* Maroon color */
+            text-align: center;
+            margin-top: 30px;
+            margin-bottom: 20px;
+        }
+
+        /* Form container styling */
+        .form-container {
+            background-color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            padding: 30px;
+            max-width: 600px;
+            margin: 40px auto;
+        }
+
+        /* Form input and label styles */
+        .form-group label {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .form-control {
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 10px;
+            font-size: 1rem;
+        }
+
+        /* Submit button styling */
+        .submit-btn {
+            background-color: #890604;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1.1rem;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .submit-btn:hover {
+            background-color: #b0100a;
+        }
+    </style>
+</head>
+<body>
+
+  <div class="main-content">
+    {% block content %}
+    <!-- Child templates will inject their content here -->
+    {% endblock %}
+  </div>
+
+</body>
+</html>

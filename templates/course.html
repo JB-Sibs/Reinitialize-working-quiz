@@ -1,0 +1,84 @@
+
+{% extends 'taskbar.html' %}
+{% load static %}
+{% block scripts %}
+<script src="{% static 'quizzes/main.js' %}?v=1" defer></script>
+{% endblock scripts %}
+{% load static %}
+{% block content %}
+    <!-- Main Content -->
+    <div class="content-container">
+        <h1>{{ obj.name }} Announcements</h1>
+    {% if user.is_professor %}
+            <a href="{% url 'class:add_announcement' obj.pk %}">
+                <button type="button" class="custom-btn">Add Announcement</button>
+            </a>
+          {% endif %}
+        <ul class="announcement-list">
+            {% for announcement in announcements %}
+                <li>
+                    <div class="announcement-container">
+                        <h3>{{ announcement.title }}</h3>
+                        <div class="announcement-item">
+                        <p>{{ announcement.content }}</p>
+                    </div>
+                      </div>
+                </li>
+            {% endfor %}
+
+        </ul>
+
+        <h1>{{ obj.name }} Materials</h1>
+        {% if user.is_professor %}
+            <a href="{% url 'class:add_module' obj.pk %}">
+                <button type="button" class="custom-btn">Add Module</button>
+            </a>
+        {% endif %}
+        <ul class="content-container">
+            {% for material in materials %}
+                <li>
+                    <div class="announcement-container">
+                        <h3>{{ material.title }}</h3>
+                        <p><a href="{{ material.content.url }}" target="_blank">Download PDF</a></p>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="quizStartModal" tabindex="-1" aria-labelle
+     dby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Start Quiz</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="modal-body-confirm"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+        <button type="button" id="start-button" class="btn btn-success">Start</button>
+      </div>
+    </div>
+  </div>
+</div>
+       <div class="h1">{{ obj.name }} Quizzes</div>
+    <hr>
+   {% for quiz in quizzes %}
+        <button
+            class="btn btn-link modal-button"
+            data-pk="{{ quiz.pk }}"
+            data-quiz="{{ quiz.name }}"
+            data-questions="{{ quiz.no_of_questions }}"
+            data-time="{{ quiz.time }}"
+            data-pass="{{ quiz.req_score_to_pass }}"
+            data-bs-toggle="modal"
+            data-bs-target="#quizStartModal">
+        {{ quiz.name }}
+        </button>
+
+{% endfor %}
+    </div>
+{% endblock %}

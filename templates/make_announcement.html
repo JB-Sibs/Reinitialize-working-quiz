@@ -1,0 +1,25 @@
+<!-- add_announcement.html -->
+{% extends 'form_style.html' %}
+
+{% block title %}Add Announcement to {{ course.name }}{% endblock %}
+
+{% block content %}
+    <h1>Add Announcement to {{ course.name }}</h1>
+
+    <div class="form-container">
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                {{ form.title.label_tag }}
+                {{ form.title }}
+            </div>
+
+            <div class="form-group">
+                {{ form.content.label_tag }}
+                {{ form.content }}
+            </div>
+
+            <button type="submit" class="submit-btn">Submit</button>
+        </form>
+    </div>
+{% endblock %}

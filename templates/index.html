@@ -1,0 +1,22 @@
+{% extends 'taskbar.html' %}
+{% load static %}
+
+
+{% block content %}
+<div class="courses">
+   {% for foo in query %}
+     <div class="course-card">
+       <div class="card-header" style="background-image: url('background.jpg');">
+         <div class="progress-indicator">N/A</div>
+         <button class="info-btn">i</button>
+       </div>
+       <div class="card-body">
+         <h3><a href="{% url 'class:course_view' foo.course.id %}">{{ foo.course }}</a></h3>
+         <p>Class Code: {{ foo.course.code }}</p>
+       </div>
+     </div>
+   {% empty %}
+     <p>No courses available.</p>  <!-- Display a message if no courses are found -->
+   {% endfor %}
+</div>
+{% endblock %}
