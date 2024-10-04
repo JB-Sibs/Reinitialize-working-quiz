@@ -140,3 +140,13 @@ def add_module(request, pk):
         'course': course
     }
     return render(request, 'add_module.html', context)
+
+
+def announcement_view(request, pk):
+    obj = Course.objects.get(pk=pk)
+    announcements = Announcement.objects.filter(course=obj)
+    context = {
+        'obj': obj,
+        'announcements': announcements,
+    }
+    return render(request, 'announcement_view.html', context)

@@ -3,5 +3,9 @@
   <component name="Black">
     <option name="sdkName" value="Python 3.12 (Canvas_campus)" />
   </component>
+<<<<<<< HEAD
   <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.12 (susunodnalang)" project-jdk-type="Python SDK" />
+=======
+  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.12 (rework)" project-jdk-type="Python SDK" />
+>>>>>>> df73c7273672123bfab76630304bd129fd773cb2
 </project>

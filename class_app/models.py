@@ -39,9 +39,10 @@ class Announcement(models.Model):
     def __str__(self):
         return self.title
 class User(AbstractUser):
-
     is_professor = models.BooleanField('is professor', default=False)
     is_student = models.BooleanField('is student', default=False)
+    email = models.EmailField(unique=True, blank=True, null=True)
+
 
     # def has_perms(self, perm_list):
     #     return True
