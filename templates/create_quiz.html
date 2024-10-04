@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- templates/create_quiz.html -->
+<h1>Create a New Quiz</h1>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}  <!-- Renders the form fields -->
+    <button type="submit" class="btn btn-primary">Create Quiz</button>
+</form>
+
+</html>

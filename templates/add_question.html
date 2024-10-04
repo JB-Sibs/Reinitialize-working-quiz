@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- templates/add_question.html -->
+<h1>Add Question {{ quiz.question_set.count }} of {{ quiz.no_of_questions }} for {{ quiz.name }}</h1>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+
+    <!-- Input for Answer Choices -->
+    <div>
+        <label for="choice_0">Answer 1</label>
+        <input type="text" id="choice_0" name="choice_0" class="form-control" required>
+    </div>
+    <div>
+        <label for="choice_1">Answer 2</label>
+        <input type="text" id="choice_1" name="choice_1" class="form-control" required>
+    </div>
+    <div>
+        <label for="choice_2">Answer 3</label>
+        <input type="text" id="choice_2" name="choice_2" class="form-control" required>
+    </div>
+    <div>
+        <label for="choice_3">Answer 4</label>
+        <input type="text" id="choice_3" name="choice_3" class="form-control" required>
+    </div>
+
+    <!-- Radio Buttons for Correct Answer -->
+    <div>
+        <label>Correct Answer:</label>
+        <div>
+            <input type="radio" name="correct" value="choice_0"> Answer 1
+        </div>
+        <div>
+            <input type="radio" name="correct" value="choice_1"> Answer 2
+        </div>
+        <div>
+            <input type="radio" name="correct" value="choice_2"> Answer 3
+        </div>
+        <div>
+            <input type="radio" name="correct" value="choice_3"> Answer 4
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Add Question</button>
+</form>
+</html>

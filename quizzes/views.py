@@ -1,18 +1,23 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from .models import Quiz
 from django.views.generic import ListView
 from django.http import JsonResponse
+from django.shortcuts import render, redirect
+from .forms import QuizForm
+from .models import Quiz
 from questions.models import Question, Answer
-
+from .forms import QuestionForm, AnswerForm
+from class_app.models import Course
 class QuizListView(ListView):
     model = Quiz
     template_name = 'course.html'
 
 
 def quiz_view(request, course_pk, quiz_pk):
-    quiz = Quiz.objects.get(pk=quiz_pk)  # Use quiz_pk here
-    return render(request, 'quiz.html', {'quiz_info': quiz})
+    quiz = Quiz.objects.get(id=quiz_pk)  # Use quiz_pk here
+    questions = quiz.question_set.all()  # Get all questions for this quiz
 
+    return render(request, 'quiz.html', {'quiz': quiz, 'questions': questions})
 def quiz_data_view(request, course_pk, quiz_pk):
     try:
         # Fetch the quiz and its questions
@@ -131,3 +136,50 @@ def save_quiz_view(request, course_pk, quiz_pk):
 
     # If the request isn't a valid AJAX POST, return an error
     return JsonResponse({'error': 'Invalid request'}, status=400)
+
+def create_quiz_view(request, course_pk):
+    if request.method == 'POST':
+        form = QuizForm(request.POST)
+        if form.is_valid():
+            quiz = form.save()  # Save the form to create the Quiz object
+            return redirect('quizzes:add_question', quiz_id=quiz.pk)  # Redirect to add questions to this quiz
+    else:
+        form = QuizForm()
+
+    return render(request, 'create_quiz.html', {'form': form})
+
+def add_question_view(request, quiz_id):
+    quiz = get_object_or_404(Quiz, id=quiz_id)
+    current_question_count = quiz.question_set.count()  # Track number of questions added
+
+    # Redirect back to course or quiz view once the specified number of questions is reached
+    if current_question_count >= quiz.no_of_questions:
+        return redirect('quizzes:quiz_prepared', quiz_id=quiz.id, course_pk=quiz.course.id)
+
+    if request.method == 'POST':
+        question_form = QuestionForm(request.POST)
+        if question_form.is_valid():
+            question = question_form.save(commit=False)
+            question.quiz = quiz
+            question.save()
+
+            # Add answer choices for the question
+            for i in range(4):  # Assuming 4 choices
+                Answer.objects.create(
+                    text=request.POST.get(f'choice_{i}'),
+                    correct=(request.POST.get('correct') == f'choice_{i}'),
+                    question=question
+                )
+
+            # Redirect to add another question if not yet reached no_of_questions
+            return redirect('quizzes:add_question', quiz_id=quiz.id)
+    else:
+        question_form = QuestionForm(initial={'quiz': quiz})
+
+    return render(request, 'add_question.html', {'form': question_form, 'quiz': quiz})
+
+def quiz_prepared_view(request, course_pk, quiz_id):
+    course = Course.objects.get(id=course_pk)  # Assuming you have a Course model
+    quizzes = Quiz.objects.filter(course=course)  # Get all quizzes related to this course
+
+    return render(request, 'course.html', {'course': course, 'quizzes': quizzes, 'obj': course})
