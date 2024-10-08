@@ -41,7 +41,7 @@ class Announcement(models.Model):
 class User(AbstractUser):
     is_professor = models.BooleanField('is professor', default=False)
     is_student = models.BooleanField('is student', default=False)
-    email = models.EmailField(unique=True, blank=True, null=True)
+    email = models.EmailField(unique=True, blank=True, null=True,)
 
 
     # def has_perms(self, perm_list):
