@@ -28,20 +28,26 @@ def home_view(request):
 
 
 def course_view(request, pk):
+    # Fetch course object
     obj = Course.objects.get(pk=pk)
+
+    # Filter related data based on course
     announcements = Announcement.objects.filter(course=obj)
     materials = Materials.objects.filter(course=obj)
     quizzes = Quiz.objects.filter(course=obj)
-    # Filter grades for quizzes related to this course, and only get the score field
-    results = Grade.objects.filter(quiz__course=obj).values_list('score', flat=True)
-    print(results)
+
+    # Filter grades for quizzes related to this course, and get the quiz name and score
+    results = Grade.objects.filter(quiz__course=obj).values('quiz__name', 'score')
+
+    # Pass context to the template
     context = {
         'obj': obj,
         'announcements': announcements,
         'materials': materials,
         'quizzes': quizzes,
-        'results': results,
+        'results': results,  # Passing both the quiz name and score
     }
+
     return render(request, 'course.html', context)
 
 

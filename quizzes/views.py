@@ -8,6 +8,8 @@ from .models import Quiz
 from questions.models import Question, Answer
 from .forms import QuestionForm, AnswerForm
 from class_app.models import Course, Grade
+from class_app.models import Grade  # Assuming the Grade model is in an app named 'classapp'
+
 class QuizListView(ListView):
     model = Quiz
     template_name = 'course.html'
@@ -51,6 +53,8 @@ def quiz_data_view(request, course_pk, quiz_pk):
     except Exception as e:
         print(f"Error: {e}")  # Print error to server logs for debugging
         return JsonResponse({'error': 'An error occurred'}, status=500)
+
+
 
 
 def save_quiz_view(request, course_pk, quiz_pk):
@@ -117,10 +121,25 @@ def save_quiz_view(request, course_pk, quiz_pk):
                         }
                     })
 
+            # Calculate the final score
             final_score = (score / total_questions) * 100
             print(f"Final score: {final_score}%")
 
+            # Determine if the user passed the quiz
             passed = final_score >= quiz.req_score_to_pass
+
+            # Save the score and result in the Grade model
+            grade, created = Grade.objects.get_or_create(
+                user=user,
+                quiz=quiz,
+                defaults={'score': score, 'passed': passed}
+            )
+
+            if not created:
+                # If a Grade object already exists, update it
+                grade.score = score
+                grade.passed = passed
+                grade.save()
 
             return JsonResponse({
                 'success': True,
