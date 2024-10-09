@@ -22,6 +22,8 @@ urlpatterns = [
 
                   path('', include('class_app.urls')),  # Class app routes
                   path('', include('quizzes.urls', namespace='quizzes')),  # Quizzes app routes
+
+                  path('', include('results.urls', namespace='results')),  # Results app routes
               ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + \
               static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

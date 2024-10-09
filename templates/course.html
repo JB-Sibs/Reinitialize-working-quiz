@@ -98,11 +98,14 @@
             </div>
         </div>
     </div>
-    
-{% if quiz.slug %}
-    <a href="{% url 'quizzes:quiz-grades' slug=quiz.slug %}">View Grades</a>
-{% else %}
-    <span>No grades available</span>
-{% endif %}
+<h2>Grades</h2>
+<ul>
+    {% for score in results %}
+        <li>{{ score }}</li>
+    {% empty %}
+        <li>No grades available.</li>
+    {% endfor %}
+</ul>
+
 
 {% endblock %}

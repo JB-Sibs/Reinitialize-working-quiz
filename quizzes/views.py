@@ -189,5 +189,11 @@ def quiz_prepared_view(request, course_pk, quiz_id):
 
 def quiz_grades(request, slug):
     quiz = get_object_or_404(Quiz, slug=slug)
-    grades = Grade.objects.filter(quiz=quiz)  # Get all grades for this quiz
-    return render(request, 'grades.html', {'quiz': quiz, 'grades': grades})
+    grades = Grade.objects.filter(quiz=quiz)
+
+    context = {
+        'quiz': quiz,
+        'grades': grades,
+    }
+
+    return render(request, 'grades.html', context)

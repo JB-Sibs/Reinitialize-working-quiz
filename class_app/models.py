@@ -57,7 +57,7 @@ class Enrollment(models.Model):
 
 class Grade(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
+    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name="grades")
     score = models.FloatField()
     passed = models.BooleanField(default=False)
 

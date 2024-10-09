@@ -32,11 +32,15 @@ def course_view(request, pk):
     announcements = Announcement.objects.filter(course=obj)
     materials = Materials.objects.filter(course=obj)
     quizzes = Quiz.objects.filter(course=obj)
+    # Filter grades for quizzes related to this course, and only get the score field
+    results = Grade.objects.filter(quiz__course=obj).values_list('score', flat=True)
+    print(results)
     context = {
         'obj': obj,
         'announcements': announcements,
         'materials': materials,
         'quizzes': quizzes,
+        'results': results,
     }
     return render(request, 'course.html', context)
 
