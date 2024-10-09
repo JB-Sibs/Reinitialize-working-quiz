@@ -148,3 +148,4 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 AUTH_USER_MODEL = 'class_app.User'  # Replace 'your_app_name' with the actual app name
+# APPEND_SLASH = False

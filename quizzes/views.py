@@ -7,17 +7,27 @@ from .forms import QuizForm
 from .models import Quiz
 from questions.models import Question, Answer
 from .forms import QuestionForm, AnswerForm
-from class_app.models import Course
+from class_app.models import Course, Grade
 class QuizListView(ListView):
     model = Quiz
     template_name = 'course.html'
 
 
 def quiz_view(request, course_pk, quiz_pk):
-    quiz = Quiz.objects.get(id=quiz_pk)  # Use quiz_pk here
-    questions = quiz.question_set.all()  # Get all questions for this quiz
+    # Fetch the quiz, along with its related course, or return a 404 if not found
+    quiz = get_object_or_404(Quiz.objects.select_related('course'), pk=quiz_pk)
 
-    return render(request, 'quiz.html', {'quiz': quiz, 'questions': questions})
+    # Get all questions for the quiz
+    questions = quiz.question_set.all()
+
+    # Pass the quiz and questions to the template
+    context = {
+        'quiz': quiz,
+        'questions': questions,
+        'course': quiz.course,  # Passing the related course as well
+    }
+
+    return render(request, 'quiz.html', context)
 def quiz_data_view(request, course_pk, quiz_pk):
     try:
         # Fetch the quiz and its questions
@@ -44,43 +54,38 @@ def quiz_data_view(request, course_pk, quiz_pk):
 
 
 def save_quiz_view(request, course_pk, quiz_pk):
-    # Ensure the request is a POST request and is sent via AJAX
     if request.method == 'POST' and request.headers.get('x-requested-with') == 'XMLHttpRequest':
         try:
+            # Log that we received a request
+            print("POST request received at save_quiz_view")
+
             # Extract the POST data
             data = request.POST
-            print(f"Received data: {data}")
+            print(f"Received POST data: {data}")
 
-            # Validate the presence of the CSRF token
+            # Validate CSRF token
             if 'csrfmiddlewaretoken' not in data:
                 return JsonResponse({'error': 'CSRF token missing'}, status=400)
 
-            # Initialize dictionary for quiz answers
             quiz_answers = {}
-
-            # Iterate over POST data and skip 'csrfmiddlewaretoken'
             for key, value in data.items():
                 if key != 'csrfmiddlewaretoken':  # Skip CSRF token
                     quiz_answers[key] = value  # Save the answer for each question
 
-            print(f"Parsed answers: {quiz_answers}")
+            print(f"Parsed quiz answers: {quiz_answers}")
 
-            # Fetch the quiz and its related questions
-            quiz = Quiz.objects.get(pk=quiz_pk)
+            # Get the quiz and user data
+            quiz = get_object_or_404(Quiz, pk=quiz_pk)
             user = request.user
-            questions = quiz.question_set.all()  # Get all questions in the quiz
+            questions = quiz.question_set.all()
 
-            # Initialize score and results list
+            # Initialize scoring variables
             score = 0
             total_questions = questions.count()
             results = []
 
-            # Iterate through all questions in the quiz
             for question in questions:
-                # Get the user's answer for the current question
                 selected_answer = quiz_answers.get(question.text)
-
-                # Fetch the correct answer from the database
                 correct_answer = question.get_correct_answer()
 
                 # If no answer is selected, treat it as wrong
@@ -93,7 +98,7 @@ def save_quiz_view(request, course_pk, quiz_pk):
                         }
                     })
                 elif selected_answer == correct_answer.text:
-                    # If the selected answer matches the correct answer
+                    # Answer is correct
                     score += 1
                     results.append({
                         str(question): {
@@ -103,7 +108,7 @@ def save_quiz_view(request, course_pk, quiz_pk):
                         }
                     })
                 else:
-                    # If the selected answer is incorrect
+                    # Answer is wrong
                     results.append({
                         str(question): {
                             'correct': False,
@@ -112,29 +117,26 @@ def save_quiz_view(request, course_pk, quiz_pk):
                         }
                     })
 
-            # Calculate the final score as a percentage
             final_score = (score / total_questions) * 100
-            print(f"Final score: {final_score}% score: {score}")
+            print(f"Final score: {final_score}%")
 
-            # Check if the user passed or failed based on the required score to pass
             passed = final_score >= quiz.req_score_to_pass
 
-            # Send the score, results, and passing status to the frontend
             return JsonResponse({
                 'success': True,
                 'message': 'Quiz saved successfully!',
                 'score': final_score,
                 'results': results,
                 'passed': passed,
-                'passing_score': quiz.req_score_to_pass  # Send the passing score to the frontend
+                'passing_score': quiz.req_score_to_pass
             })
 
         except Exception as e:
             # Log and return any error encountered
             print(f"Error processing quiz submission: {e}")
-            return JsonResponse({'error': 'An error occurred while processing your submission.'}, status=500)
+            return JsonResponse({'error': f'An error occurred: {e}'}, status=500)
 
-    # If the request isn't a valid AJAX POST, return an error
+    # If the request isn't a valid POST, return an error
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
 def create_quiz_view(request, course_pk):
@@ -183,3 +185,9 @@ def quiz_prepared_view(request, course_pk, quiz_id):
     quizzes = Quiz.objects.filter(course=course)  # Get all quizzes related to this course
 
     return render(request, 'course.html', {'course': course, 'quizzes': quizzes, 'obj': course})
+
+
+def quiz_grades(request, slug):
+    quiz = get_object_or_404(Quiz, slug=slug)
+    grades = Grade.objects.filter(quiz=quiz)  # Get all grades for this quiz
+    return render(request, 'grades.html', {'quiz': quiz, 'grades': grades})

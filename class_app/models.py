@@ -2,7 +2,7 @@ from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser, Group, Permission, User
 from django.core.exceptions import PermissionDenied
-
+from quizzes.models import Quiz
 class Course(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField()
@@ -56,15 +56,14 @@ class Enrollment(models.Model):
         return f"{self.user} enrolled in {self.course}"
 
 class Grade(models.Model):
-    grade_value = models.CharField(max_length=3)
-    grade_type = models.CharField(max_length=50)
-    date_recorded = models.DateField(auto_now_add=True)
-    student_id = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
-    Course_id = models.ForeignKey(Course, on_delete=models.CASCADE, null=True, blank=True)
-    assignment_id = models.ForeignKey(Assignment, on_delete=models.CASCADE, null=True, blank=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
+    score = models.FloatField()
+    passed = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"{self.grade_value} - {self.student_id} - {self.Course_id}"
+        return f"{self.user.username} - {self.quiz.name} - {self.score}"
+
 
 class Materials(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='modules')
