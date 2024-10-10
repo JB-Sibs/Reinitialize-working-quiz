@@ -169,17 +169,19 @@ def announcement_view(request, pk):
 
 
 def add_exam_result_view(request, course_pk):
-    course = get_object_or_404(Course, pk=course_pk)
+    course = get_object_or_404(Course, pk=course_pk)  # Get the course by its primary key
 
     if request.method == 'POST':
         form = ExamResultForm(request.POST)
         if form.is_valid():
             exam_result = form.save(commit=False)
-            exam_result.professor = request.user  # Assign the logged-in professor
+            exam_result.course = course  # Automatically set the course
+            exam_result.professor = request.user  # Set the logged-in professor
             exam_result.save()
-            return redirect('class:course_view', pk=course.pk)  # Redirect to a page to see the results or course
-
+            return redirect('class:course_view', pk=course.pk)  # Redirect to the course view
     else:
-        form = ExamResultForm()
+        # Set initial value for the 'course' field in the form
+        form = ExamResultForm(initial={'course': course})
 
     return render(request, 'add_exam_result.html', {'form': form, 'course': course})
+

@@ -165,7 +165,7 @@
                 <tbody>
                     {% for result in results_prof %}
                         <tr>
-                            <td>{{ result.user }}</td> <!-- Show the student's full name -->
+                            <td>{{ result.user.get_full_name }}</td>
                             <td>{{ result.quiz__name }}</td>
                             <td>{{ result.score }}</td>
                             <td>{{ result.passed|yesno:"Yes,No" }}</td>

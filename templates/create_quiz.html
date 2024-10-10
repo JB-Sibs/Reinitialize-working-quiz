@@ -1,11 +1,109 @@
 <!DOCTYPE html>
 <html lang="en">
-<!-- templates/create_quiz.html -->
-<h1>Create a New Quiz</h1>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}  <!-- Renders the form fields -->
-    <button type="submit" class="btn btn-primary">Create Quiz</button>
-</form>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create a New Quiz</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet"> <!-- Improved Font -->
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
 
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 90%; /* Added margin from the sides */
+            transition: all 0.3s ease;
+        }
+
+        .container:hover {
+            box-shadow: 0 6px 30px rgba(0, 0, 0, 0.15); /* Hover effect for container */
+        }
+
+        h1 {
+            text-align: center;
+            color: #800000;
+            font-size: 24px;
+            margin-bottom: 20px;
+            letter-spacing: 1px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            padding-left: 10px;
+            padding-right: 10px; /* Add padding inside the form */
+        }
+
+        label {
+            font-weight: 500;
+            color: #333;
+        }
+
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus, textarea:focus {
+            border-color: #800000; /* Focus color effect */
+            outline: none;
+        }
+
+        textarea {
+            height: 120px;
+            resize: none;
+        }
+
+        .btn-submit {
+            background-color: #800000;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .btn-submit:hover {
+            background-color: #660000; /* Darker red on hover */
+            transform: translateY(-2px); /* Slight upward movement on hover */
+        }
+
+        .btn-submit:active {
+            transform: translateY(0); /* Restore on click */
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Create New Quiz to {{ course.name }}</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}  <!-- Renders the form fields -->
+        <button type="submit" class="btn-submit">Submit</button>
+    </form>
+</div>
+
+</body>
 </html>

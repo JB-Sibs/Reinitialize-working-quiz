@@ -16,4 +16,4 @@ class Materialsform(ModelForm):
 class ExamResultForm(forms.ModelForm):
     class Meta:
         model = ExamResult
-        fields = ['student', 'course', 'exam_name', 'score', 'total_items']
+        fields = ['student', 'exam_name', 'score', 'total_items']

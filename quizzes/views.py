@@ -159,15 +159,20 @@ def save_quiz_view(request, course_pk, quiz_pk):
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
 def create_quiz_view(request, course_pk):
+    course = get_object_or_404(Course, pk=course_pk)  # Get the course by its primary key
+
     if request.method == 'POST':
         form = QuizForm(request.POST)
         if form.is_valid():
-            quiz = form.save()  # Save the form to create the Quiz object
-            return redirect('quizzes:add_question', quiz_id=quiz.pk)  # Redirect to add questions to this quiz
+            quiz = form.save(commit=False)  # Do not save to the database yet
+            quiz.course = course  # Automatically assign the course to the quiz
+            quiz.save()  # Now save the quiz with the course assigned
+            return redirect('quizzes:add_question', quiz_id=quiz.pk)  # Redirect to the question adding view
     else:
-        form = QuizForm()
+        # Prefill the course in the form
+        form = QuizForm(initial={'course': course})
 
-    return render(request, 'create_quiz.html', {'form': form})
+    return render(request, 'create_quiz.html', {'form': form, 'course': course})
 
 def add_question_view(request, quiz_id):
     quiz = get_object_or_404(Quiz, id=quiz_id)

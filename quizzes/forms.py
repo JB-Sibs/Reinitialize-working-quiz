@@ -10,7 +10,7 @@ class QuizForm(forms.ModelForm):
         fields = ['name', 'course', 'topic', 'no_of_questions', 'time', 'req_score_to_pass']
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control'}),
-            'course': forms.Select(attrs={'class': 'form-control'}),
+            'course': forms.HiddenInput(),
             'topic': forms.TextInput(attrs={'class': 'form-control'}),
             'no_of_questions': forms.NumberInput(attrs={'class': 'form-control'}),
             'time': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'duration of the quiz in minutes'}),
