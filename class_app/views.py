@@ -6,7 +6,7 @@ from django.contrib import messages
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
 
-from .forms import Announcementform, Materialsform
+from .forms import Announcementform, Materialsform, ExamResultForm
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import PermissionDenied
 
@@ -35,10 +35,13 @@ def course_view(request, pk):
     announcements = Announcement.objects.filter(course=obj)
     materials = Materials.objects.filter(course=obj)
     quizzes = Quiz.objects.filter(course=obj)
+    # Fetch exam results for the current user and course
+    exam_results = ExamResult.objects.filter(course=obj, student=request.user)
+    exam_results_prof= ExamResult.objects.filter(course=obj)
 
     # Filter grades for quizzes related to this course, and get the quiz name and score
-    results = Grade.objects.filter(quiz__course=obj).values('quiz__name', 'score')
-
+    results = Grade.objects.filter(quiz__course=obj, user=request.user).values('quiz__name', 'score')
+    results_prof = Grade.objects.filter(quiz__course=obj).values('quiz__name', 'score')
     # Pass context to the template
     context = {
         'obj': obj,
@@ -46,6 +49,9 @@ def course_view(request, pk):
         'materials': materials,
         'quizzes': quizzes,
         'results': results,  # Passing both the quiz name and score
+        'exam_results': exam_results,  # Passing the exam results to the template'
+        'exam_results_prof': exam_results_prof,  # Passing the exam results to the template'
+        'results_prof': results_prof,
     }
 
     return render(request, 'course.html', context)
@@ -160,3 +166,20 @@ def announcement_view(request, pk):
         'announcements': announcements,
     }
     return render(request, 'announcement_view.html', context)
+
+
+def add_exam_result_view(request, course_pk):
+    course = get_object_or_404(Course, pk=course_pk)
+
+    if request.method == 'POST':
+        form = ExamResultForm(request.POST)
+        if form.is_valid():
+            exam_result = form.save(commit=False)
+            exam_result.professor = request.user  # Assign the logged-in professor
+            exam_result.save()
+            return redirect('class:course_view', pk=course.pk)  # Redirect to a page to see the results or course
+
+    else:
+        form = ExamResultForm()
+
+    return render(request, 'add_exam_result.html', {'form': form, 'course': course})

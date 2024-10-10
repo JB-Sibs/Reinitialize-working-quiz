@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import ModelForm
-from .models import Announcement, Materials
+from .models import *
 
 class Announcementform(ModelForm):
     class Meta:
@@ -11,3 +11,9 @@ class Materialsform(ModelForm):
     class Meta:
         model = Materials
         fields = ('title', 'content',)
+
+
+class ExamResultForm(forms.ModelForm):
+    class Meta:
+        model = ExamResult
+        fields = ['student', 'course', 'exam_name', 'score', 'total_items']

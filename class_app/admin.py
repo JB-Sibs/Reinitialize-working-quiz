@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Course, Enrollment, Assignment, Submission, User, Grade, Announcement, Materials
+from .models import Course, Enrollment, Assignment, Submission, User, Grade, Announcement, Materials,ExamResult
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
 
@@ -31,3 +31,4 @@ admin.site.register(User, UserAdmin)
 admin.site.register(Grade)
 admin.site.register(Announcement)
 admin.site.register(Materials)
+admin.site.register(ExamResult)

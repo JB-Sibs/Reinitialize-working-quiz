@@ -59,45 +59,48 @@
         </ul>
 
         <!-- Quizzes Section -->
-        <h1>{{ obj.name }} Quizzes</h1>
-        <hr>
+      <!-- Quizzes Section -->
+<h1>{{ obj.name }} Quizzes</h1>
+<hr>
 
-        {% if user.is_professor %}
-            <a href="{% url 'quizzes:create_quiz' obj.pk %}">
-                <button type="button" class="custom-btn">Add Quiz</button>
-            </a>
-        {% endif %}
+{% if user.is_professor %}
+    <a href="{% url 'quizzes:create_quiz' obj.pk %}">
+        <button type="button" class="custom-btn">Add Quiz</button>
+    </a>
+{% endif %}
 
-        {% for quiz in quizzes %}
-            <button class="btn btn-link modal-button"
-                data-pk="{{ quiz.pk }}"
-                data-quiz="{{ quiz.name }}"
-                data-questions="{{ quiz.no_of_questions }}"
-                data-time="{{ quiz.time }}"
-                data-pass="{{ quiz.req_score_to_pass }}"
-                data-bs-toggle="modal"
-                data-bs-target="#quizStartModal">
-                {{ quiz.name }}
-            </button>
-        {% endfor %}
-    </div>
+{% for quiz in quizzes %}
+    <button class="btn btn-link modal-button"
+        data-pk="{{ quiz.pk }}"
+        data-quiz="{{ quiz.name }}"
+        data-questions="{{ quiz.no_of_questions }}"
+        data-time="{{ quiz.time }}"
+        data-pass="{{ quiz.req_score_to_pass }}"
+        data-bs-toggle="modal"
+        data-bs-target="#quizStartModal">
+        {{ quiz.name }}
+    </button>
+{% endfor %}
 
-    <!-- Modal for Starting Quiz -->
-    <div class="modal fade" id="quizStartModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="exampleModalLabel">Start Quiz</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body" id="modal-body-confirm"></div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
-                    <button type="button" id="start-button" class="btn btn-success">Start</button>
-                </div>
+<!-- Modal for Starting Quiz -->
+<div class="modal fade" id="quizStartModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Start Quiz</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="modal-body-confirm"></div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                <button type="button" id="start-button" class="btn btn-success">Start</button>
             </div>
         </div>
     </div>
+</div>
+
+<!-- Student View -->
+{% if user.is_student %}
 <h2>Quiz Scores</h2>
 <table border="1">
     <thead>
@@ -120,5 +123,94 @@
     </tbody>
 </table>
 
+<h2>Exam Scores</h2>
+<table border="1">
+    <thead>
+        <tr>
+            <th>Exam Name</th>
+            <th>Score</th>
+            <th>Total Items</th>
+            <th>Date Taken</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for exam in exam_results %}
+        <tr>
+            <td>{{ exam.exam_name }}</td>
+            <td>{{ exam.score }}</td>
+            <td>{{ exam.total_items }}</td>
+            <td>{{ exam.date_taken }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="4">No exam results available.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endif %}
 
+<!-- Professor View -->
+ {% if user.is_professor %}
+            <h2>Quiz Scores (All Students)</h2>
+            <table border="1">
+                <thead>
+                    <tr>
+                        <th>Student Name</th>
+                        <th>Quiz Name</th>
+                        <th>Score</th>
+                        <th>Passed</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for result in results_prof %}
+                        <tr>
+                            <td>{{ result.user }}</td> <!-- Show the student's full name -->
+                            <td>{{ result.quiz__name }}</td>
+                            <td>{{ result.score }}</td>
+                            <td>{{ result.passed|yesno:"Yes,No" }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="4">No quiz results available.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+<h2>Exam Scores (All Students)</h2>
+<table border="1">
+    <thead>
+        <tr>
+            <th>Student Name</th>
+            <th>Exam Name</th>
+            <th>Score</th>
+            <th>Total Items</th>
+            <th>Date Taken</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for exam in exam_results_prof %}
+        <tr>
+            <td>{{ exam.student }}</td> <!-- Display student name -->
+            <td>{{ exam.exam_name }}</td>
+            <td>{{ exam.score }}</td>
+            <td>{{ exam.total_items }}</td>
+            <td>{{ exam.date_taken }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="5">No exam results available.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<!-- Add exam results button for professors -->
+<a href="{% url 'class:add_exam_result' obj.pk %}">
+    <button type="button" class="custom-btn">Add exam results</button>
+</a>
+    
+{% endif %}
+    </div>
 {% endblock %}

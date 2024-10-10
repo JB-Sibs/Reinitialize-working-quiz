@@ -13,5 +13,6 @@ urlpatterns = [
     path('course/<int:pk>/add_announcement', add_announcement, name='add_announcement'),
     path('course/<int:pk>/add_module', add_module, name='add_module'),
     path('course/<int:pk>/announcements', announcement_view, name='announcement_view'),
+    path('course/<int:course_pk>/exam/add/',add_exam_result_view, name='add_exam_result'),
     # Additional URL patterns for other views if needed
 ]

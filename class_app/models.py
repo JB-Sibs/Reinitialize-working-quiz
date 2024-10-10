@@ -80,4 +80,13 @@ class Materials(models.Model):
         if not self.pk and not self.created_by.is_professor:
             raise PermissionDenied("Only professors can create modules.")
         super().save(*args, **kwargs)
+
+class ExamResult(models.Model):
+    student = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, limit_choices_to={'is_student': True})
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="exam_results")
+    exam_name = models.CharField(max_length=255)
+    score = models.FloatField()
+    total_items = models.FloatField()
+    date_taken = models.DateField(auto_now_add=True)
+    professor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, limit_choices_to={'is_professor': True}, related_name="added_results")
 # Create your models here.
