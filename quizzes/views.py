@@ -147,7 +147,8 @@ def save_quiz_view(request, course_pk, quiz_pk):
                 'score': final_score,
                 'results': results,
                 'passed': passed,
-                'passing_score': quiz.req_score_to_pass
+                'passing_score': quiz.req_score_to_pass,
+                'user': user.username
             })
 
         except Exception as e:
@@ -180,7 +181,7 @@ def add_question_view(request, quiz_id):
 
     # Redirect back to course or quiz view once the specified number of questions is reached
     if current_question_count >= quiz.no_of_questions:
-        return redirect('quizzes:quiz_prepared', quiz_id=quiz.id, course_pk=quiz.course.id)
+        return redirect('class:course_view', pk=quiz.course.id)  # Redirect to course view
 
     if request.method == 'POST':
         question_form = QuestionForm(request.POST)

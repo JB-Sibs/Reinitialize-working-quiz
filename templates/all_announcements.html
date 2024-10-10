@@ -1,0 +1,24 @@
+{% extends 'taskbar.html' %}
+{% load static %}
+
+{% block content %}
+    <div class="content-container">
+        <h1>All Announcements</h1>
+
+        <ul class="announcement-list">
+            {% for announcement in announcements %}
+                <li>
+                    <div class="announcement-container">
+                        <h3>{{ announcement.title }}</h3>
+                        <p><strong>Course:</strong> {{ announcement.course.name }}</p> <!-- Display course name -->
+                        <div class="announcement-item">
+                            <p>{{ announcement.content }}</p>
+                        </div>
+                    </div>
+                </li>
+            {% empty %}
+                <li>No announcements available.</li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock %}

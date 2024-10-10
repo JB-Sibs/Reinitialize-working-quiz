@@ -1,0 +1,118 @@
+{% extends 'taskbar.html' %}
+{% load static %}
+<div class="main-content">
+    {% block content %}
+<!-- Student View -->
+{% if user.is_student %}
+<h2>Quiz Scores</h2>
+<table border="1">
+    <thead>
+        <tr>
+            <th>Quiz Name</th>
+            <th>Score</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for result in results %}
+        <tr>
+            <td>{{ result.quiz__name }}</td>
+            <td>{{ result.score }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="2">No quiz results available.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<h2>Exam Scores</h2>
+<table border="1">
+    <thead>
+        <tr>
+            <th>Exam Name</th>
+            <th>Score</th>
+            <th>Total Items</th>
+            <th>Date Taken</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for exam in exam_results %}
+        <tr>
+            <td>{{ exam.exam_name }}</td>
+            <td>{{ exam.score }}</td>
+            <td>{{ exam.total_items }}</td>
+            <td>{{ exam.date_taken }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="4">No exam results available.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+
+<!-- Professor View -->
+ {% if user.is_professor %}
+            <h2>Quiz Scores (All Students)</h2>
+            <table border="1">
+                <thead>
+                    <tr>
+                        <th>Student Name</th>
+                        <th>Quiz Name</th>
+                        <th>Score</th>
+                        <th>Passed</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for result in results_prof %}
+                        <tr>
+                            <td>{{ result.user.get_full_name }}</td>
+                            <td>{{ result.quiz__name }}</td>
+                            <td>{{ result.score }}</td>
+                            <td>{{ result.passed|yesno:"Yes,No" }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="4">No quiz results available.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+<h2>Exam Scores (All Students)</h2>
+<table border="1">
+    <thead>
+        <tr>
+            <th>Student Name</th>
+            <th>Exam Name</th>
+            <th>Score</th>
+            <th>Total Items</th>
+            <th>Date Taken</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for exam in exam_results_prof %}
+        <tr>
+            <td>{{ exam.student }}</td> <!-- Display student name -->
+            <td>{{ exam.exam_name }}</td>
+            <td>{{ exam.score }}</td>
+            <td>{{ exam.total_items }}</td>
+            <td>{{ exam.date_taken }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="5">No exam results available.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<!-- Add exam results button for professors -->
+<a href="{% url 'class:add_exam_result' obj.pk %}">
+    <button type="button" class="custom-btn">Add exam results</button>
+</a>
+    
+{% endif %}
+{% endblock %}

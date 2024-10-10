@@ -41,7 +41,8 @@ def course_view(request, pk):
 
     # Filter grades for quizzes related to this course, and get the quiz name and score
     results = Grade.objects.filter(quiz__course=obj, user=request.user).values('quiz__name', 'score')
-    results_prof = Grade.objects.filter(quiz__course=obj).values('quiz__name', 'score')
+    results_prof = Grade.objects.filter(quiz__course=obj).values('user__username', 'quiz__name', 'score', 'passed')
+
     # Pass context to the template
     context = {
         'obj': obj,
@@ -56,6 +57,68 @@ def course_view(request, pk):
 
     return render(request, 'course.html', context)
 
+def all_announcements_view(request):
+    # Fetch all courses for the current user through Enrollment
+    user_courses = Course.objects.filter(enrollment__user=request.user)
+
+    # Fetch all announcements related to those courses
+    announcements = Announcement.objects.filter(course__in=user_courses)
+
+    # Pass context to the template
+    context = {
+        'announcements': announcements,
+    }
+
+    return render(request, 'all_announcements.html', context)
+
+
+def all_materials_view(request):
+    # Fetch all courses for the current user through Enrollment
+    user_courses = Course.objects.filter(enrollment__user=request.user)
+
+    # Fetch all announcements related to those courses
+    materials = Materials.objects.filter(course__in=user_courses)
+
+    # Pass context to the template
+    context = {
+        'materials': materials,
+    }
+
+    return render(request, 'all_materials.html', context)
+
+
+def grades_view(request, pk):
+    obj = Course.objects.get(pk=pk)
+    exam_results = ExamResult.objects.filter(course=obj, student=request.user)
+    exam_results_prof = ExamResult.objects.filter(course=obj)
+
+    # Filter grades for quizzes related to this course, and get the quiz name and score
+    results = Grade.objects.filter(quiz__course=obj, user=request.user).values('quiz__name', 'score')
+    results_prof = Grade.objects.filter(quiz__course=obj).values('quiz__name', 'score')
+    # Pass context to the template
+    context = {
+        'obj': obj,
+        'results': results,  # Passing both the quiz name and score
+        'exam_results': exam_results,  # Passing the exam results to the template'
+        'exam_results_prof': exam_results_prof,  # Passing the exam results to the template'
+        'results_prof': results_prof,
+    }
+    return render(request, 'grades_view.html', context)
+
+
+def activities_view(request, pk):
+    obj = Course.objects.get(pk=pk)
+    quizzes = Quiz.objects.filter(course=obj)
+
+    # Filter grades for quizzes related to this course, and get the quiz name and score
+    results = Grade.objects.filter(quiz__course=obj, user=request.user).values('quiz__name', 'score')
+    results_prof = Grade.objects.filter(quiz__course=obj).values('quiz__name', 'score')
+    context = {
+        'obj': obj,
+        'quizzes': quizzes,
+        'results': results,  # Passing both the quiz name and score
+    }
+    return render(request, 'activities_view.html', context)
 
 def professor_dashboard(request):
 
@@ -168,6 +231,17 @@ def announcement_view(request, pk):
     return render(request, 'announcement_view.html', context)
 
 
+def materials_view(request, pk):
+    obj = Course.objects.get(pk=pk)
+    materials = Materials.objects.filter(course=obj)
+    context = {
+        'obj': obj,
+        'materials': materials,
+    }
+    return render(request, 'materials_view.html', context)
+
+
+
 def add_exam_result_view(request, course_pk):
     course = get_object_or_404(Course, pk=course_pk)  # Get the course by its primary key
 
@@ -184,4 +258,3 @@ def add_exam_result_view(request, course_pk):
         form = ExamResultForm(initial={'course': course})
 
     return render(request, 'add_exam_result.html', {'form': form, 'course': course})
-

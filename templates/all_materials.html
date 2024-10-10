@@ -72,28 +72,22 @@
 <body>
 
     <!-- Child templates will inject their content here -->
-    
-   {% if user.is_professor %}
-       <a href="{% url 'class:add_announcement' obj.pk %}">
-           <button type="button" class="custom-btn">Add Announcement</button>
-       </a>
-   {% endif %}
-   
+        
    <div class="canvas-dashboard">
        <!-- Module Section for Announcements -->
        <div class="module-section">
            <div class="module-header" onclick="toggleModuleContent(this)">
-               {{ obj.name }} ANNOUNCEMENTS
+               {{ obj.name }} MODULES
                <span class="toggle-icon">›</span>
            </div>
            <div class="module-content">
                <ul class="materials-list">
-                   {% for announcement in announcements %}
+                   {% for material in materials %}
                        <li class="module-item">
                            <i class="module-icon">📄</i>
-                           <h3>{{ announcement.title }}</h3>
-                           <p>{{ announcement.content }}</p>
-                           <p><small>Posted on: {{ announcement.posted_on|date:"F d, Y" }}</small></p>
+                           <h3>{{ material.title }}</h3>
+                           <p>{{ material.content }}</p>
+                           <p><small>Posted on: {{ material.posted_on|date:"F d, Y" }}</small></p>
                        </li>
                    {% endfor %}
                </ul>

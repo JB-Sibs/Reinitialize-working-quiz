@@ -176,10 +176,22 @@
     </div>
     <div class="dashboard-content">
       <ul>
-        <li><a href="#">Assignments</a></li>
-        <li><a href="#">Courses</a></li>
-        <li><a href="#">Enrollments</a></li>
-        <li><a href="#">Submissions</a></li>
+        <li><a href="{% url 'class:home_view' %}">Courses</a></li>
+                {% if obj and obj.pk %}
+                    <li>
+                    <a href="{% url 'class:course_view' obj.pk %}">Home</a>
+                    </li>
+                    <li><a href="{% url 'class:announcement_view' obj.pk %}">Announcements</a></li>
+                    <li><a href="{% url 'class:materials_view' obj.pk %}">Modules</a></li>
+                    <li><a href="{% url 'class:activities_view' obj.pk %}">Activities / Quizzes</a></li>
+                    <li><a href="{% url 'class:grades_view' obj.pk %}">Grades</a></li>
+                {% else %}
+                    <span>
+                        <li><a href="{% url 'class:all_announcements_view' %}">Announcements</a></li>
+                        <li><a href="{% url 'class:all_materials_view' %}">Modules</a></li>
+                    </span>
+                {% endif %}
+
         <li><a href="{% url 'class:change_password' %}">Change Password</a></li>
       </ul>
       <nav class="navbar">
