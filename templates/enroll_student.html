@@ -1,14 +1,33 @@
 {% extends 'taskbar.html' %}
 {% block content %}
-    <h1>Enroll Student in {{ course.name }}</h1>
-    
+    <h1>Manage Enrollments for {{ course.name }}</h1>
+
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <h2>Enroll a Student</h2>
     <form method="POST">
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit" class="btn btn-primary">Enroll Student</button>
+        <button type="submit" name="enroll" class="btn btn-primary">Enroll Student</button>
     </form>
 
-    <a href="{% url 'class:course_view' course.pk %}">
-        <button type="button" class="btn btn-secondary">Cancel</button>
-    </a>
+    <h2>Current Enrollments</h2>
+    <ul>
+        {% for enrollment in enrollments %}
+            <li>
+                {{ enrollment.user.username }} 
+                <form method="POST" style="display:inline;">
+                    {% csrf_token %}
+                    <input type="hidden" name="student_id" value="{{ enrollment.user.id }}">
+                    <button type="submit" name="delete" class="btn btn-danger">Delete</button>
+                </form>
+            </li>
+        {% endfor %}
+    </ul>
 {% endblock %}

@@ -360,18 +360,35 @@ def enroll_student_view(request, course_pk):
     course = get_object_or_404(Course, pk=course_pk)
 
     if request.method == 'POST':
-        form = EnrollmentForm(request.POST)
-        if form.is_valid():
-            enrollment = form.save(commit=False)
-            enrollment.course = course  # Assign the course
-            enrollment.save()  # Save the enrollment
+        # Check if we are trying to enroll or delete
+        if 'enroll' in request.POST:
+            form = EnrollmentForm(request.POST)
+            if form.is_valid():
+                user = form.cleaned_data['user']  # Assuming 'user' is a field in your EnrollmentForm
+                # Check if the user is already enrolled in this course
+                if Enrollment.objects.filter(course=course, user=user).exists():
+                    messages.error(request, f"{user.username} is already enrolled in this course.")
+                else:
+                    enrollment = form.save(commit=False)
+                    enrollment.course = course  # Assign the course
+                    enrollment.save()  # Save the enrollment
+                    return redirect('class:course_view', pk=course.pk)  # Redirect to the course view
+
+        elif 'delete' in request.POST:
+            student_id = request.POST.get('student_id')
+            enrollment = get_object_or_404(Enrollment, user_id=student_id, course=course)
+            enrollment.delete()  # Delete the enrollment
             return redirect('class:course_view', pk=course.pk)  # Redirect to the course view
+
     else:
         form = EnrollmentForm()
 
+    # Get current enrollments for this course
+    current_enrollments = Enrollment.objects.filter(course=course).select_related('user')
+
     context = {
         'course': course,
-        'form': form
+        'form': form,
+        'enrollments': current_enrollments,
     }
     return render(request, 'enroll_student.html', context)
-

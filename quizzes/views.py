@@ -18,15 +18,30 @@ class QuizListView(ListView):
 def quiz_view(request, course_pk, quiz_pk):
     # Fetch the quiz, along with its related course, or return a 404 if not found
     quiz = get_object_or_404(Quiz.objects.select_related('course'), pk=quiz_pk)
-
-    # Get all questions for the quiz
     questions = quiz.question_set.all()
 
-    # Pass the quiz and questions to the template
+    # Get the current user
+    user = request.user
+
+    # Calculate remaining attempts by counting how many times the student has taken the quiz
+    attempts_taken = Grade.objects.filter(user=user, quiz=quiz).count()
+    attempts_left = quiz.attempts_allowed - attempts_taken
+
+    # If no attempts are left, deny access to the quiz
+    if attempts_left <= 0:
+        return render(request, 'quiz.html', {
+            'quiz': quiz,
+            'course': quiz.course,
+            'error_message': 'You have no attempts left for this quiz.'
+        })
+
+    # Pass the quiz and questions to the template, along with the remaining attempts and time limit
     context = {
         'quiz': quiz,
         'questions': questions,
-        'course': quiz.course,  # Passing the related course as well
+        'course': quiz.course,
+        'attempts_left': attempts_left,  # Remaining attempts
+        'time_limit': quiz.time_limit,   # Time limit in minutes
     }
 
     return render(request, 'quiz.html', context)
@@ -56,30 +71,20 @@ def quiz_data_view(request, course_pk, quiz_pk):
 def save_quiz_view(request, course_pk, quiz_pk):
     if request.method == 'POST' and request.headers.get('x-requested-with') == 'XMLHttpRequest':
         try:
-            # Log that we received a request
-            print("POST request received at save_quiz_view")
-
-            # Extract the POST data
             data = request.POST
-            print(f"Received POST data: {data}")
-
-            # Validate CSRF token
-            if 'csrfmiddlewaretoken' not in data:
-                return JsonResponse({'error': 'CSRF token missing'}, status=400)
-
-            quiz_answers = {}
-            for key, value in data.items():
-                if key != 'csrfmiddlewaretoken':  # Skip CSRF token
-                    quiz_answers[key] = value  # Save the answer for each question
-
-            print(f"Parsed quiz answers: {quiz_answers}")
-
-            # Get the quiz and user data
-            quiz = get_object_or_404(Quiz, pk=quiz_pk)
             user = request.user
+
+            quiz = get_object_or_404(Quiz, pk=quiz_pk)
             questions = quiz.question_set.all()
 
-            # Initialize scoring variables
+            # Check if the user has exceeded their attempts
+            attempts_taken = Grade.objects.filter(user=user, quiz=quiz).count()
+            if attempts_taken >= quiz.attempts_allowed:
+                return JsonResponse({'error': 'No more attempts allowed'}, status=403)
+
+            # Parse submitted answers
+            quiz_answers = {key: value for key, value in data.items() if key != 'csrfmiddlewaretoken'}
+
             score = 0
             total_questions = questions.count()
             results = []
@@ -88,17 +93,7 @@ def save_quiz_view(request, course_pk, quiz_pk):
                 selected_answer = quiz_answers.get(question.text)
                 correct_answer = question.get_correct_answer()
 
-                # If no answer is selected, treat it as wrong
-                if not selected_answer:
-                    results.append({
-                        str(question): {
-                            'correct': False,
-                            'selected_answer': 'None',
-                            'correct_answer': correct_answer.text if correct_answer else 'None'
-                        }
-                    })
-                elif selected_answer == correct_answer.text:
-                    # Answer is correct
+                if selected_answer == correct_answer.text:
                     score += 1
                     results.append({
                         str(question): {
@@ -108,54 +103,32 @@ def save_quiz_view(request, course_pk, quiz_pk):
                         }
                     })
                 else:
-                    # Answer is wrong
                     results.append({
                         str(question): {
                             'correct': False,
-                            'selected_answer': selected_answer,
+                            'selected_answer': selected_answer or 'None',
                             'correct_answer': correct_answer.text
                         }
                     })
 
-            # Calculate the final score
             final_score = (score / total_questions) * 100
-            print(f"Final score: {final_score}%")
-
-            # Determine if the user passed the quiz
             passed = final_score >= quiz.req_score_to_pass
 
-            # Save the score and result in the Grade model with the quiz's period
-            grade, created = Grade.objects.get_or_create(
-                user=user,
-                quiz=quiz,
-                defaults={'score': score, 'passed': passed, 'period': quiz.period}  # Save the period from the quiz
-            )
-
-            if not created:
-                # If a Grade object already exists, update it
-                grade.score = score
-                grade.passed = passed
-                grade.period = quiz.period  # Ensure period is updated if necessary
-                grade.save()
+            # Save the grade
+            Grade.objects.create(user=user, quiz=quiz, score=final_score, passed=passed)
 
             return JsonResponse({
                 'success': True,
-                'message': 'Quiz saved successfully!',
+                'message': 'Quiz submitted successfully!',
                 'score': final_score,
                 'results': results,
-                'passed': passed,
-                'passing_score': quiz.req_score_to_pass,
-                'user': user.username
+                'passed': passed
             })
 
         except Exception as e:
-            # Log and return any error encountered
-            print(f"Error processing quiz submission: {e}")
-            return JsonResponse({'error': f'An error occurred: {e}'}, status=500)
+            return JsonResponse({'error': str(e)}, status=500)
 
-    # If the request isn't a valid POST, return an error
     return JsonResponse({'error': 'Invalid request'}, status=400)
-
 
 def create_quiz_view(request, course_pk):
     course = get_object_or_404(Course, pk=course_pk)  # Get the course by its primary key

@@ -7,12 +7,34 @@
 <script src="{% static 'quizzes/quiz.js' %}?v=1" defer></script>
 <script>
     var courseId = "{{ course.id }}";  <!-- Assuming you have access to quiz_info.course.id -->
+     // JavaScript to handle timer
+        let timeLimit = {{ time_limit }} * 60;  // Convert to seconds
+        let timerElement = document.getElementById('time_display');
+
+        let timer = setInterval(() => {
+            if (timeLimit <= 0) {
+                clearInterval(timer);
+                alert("Time's up! Submitting your quiz...");
+                document.getElementById('quiz_form').submit();  // Auto-submit the form when time runs out
+            } else {
+                timeLimit -= 1;
+                let minutes = Math.floor(timeLimit / 60);
+                let seconds = timeLimit % 60;
+                timerElement.innerText = `Time Left: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+            }
+        }, 1000);
 </script>
 {% endblock scripts %}
 
 {% block content %}
 {{ quiz_info.name }}
-
+  {% if error_message %}
+    <div class="alert alert-danger">{{ error_message }}</div>
+{% else %}
+    <p>Time Limit: <span id="time_limit">{{ time_limit }}</span> minutes</p>
+    <p>Attempts Left: <span id="attempts_left">{{ attempts_left }}</span></p>
+    <p id="time_display">Loading timer...</p>
+    {% endif %}
 <form id="quiz_form" class="mb-3">
     {% csrf_token %}
     <div id="quiz_box"></div>

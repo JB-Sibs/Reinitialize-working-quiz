@@ -19,8 +19,6 @@ urlpatterns = [
     path('course/<int:course_pk>/exam/add/', add_exam_result_view, name='add_exam_result'),
     path('announcements/', all_announcements_view, name='all_announcements_view'),
     path('materials/', all_materials_view, name='all_materials_view'),
-path('course/<int:course_pk>/enroll/', enroll_student_view, name='enroll_student'),
-
-
+    path('course/<int:course_pk>/enroll/', enroll_student_view, name='enroll_student'),
     # Additional URL patterns for other views if needed
 ]
