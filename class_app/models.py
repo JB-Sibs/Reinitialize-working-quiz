@@ -56,11 +56,16 @@ class Enrollment(models.Model):
         return f"{self.user} enrolled in {self.course}"
 
 class Grade(models.Model):
+    PERIOD_CHOICES = [
+        ('prelim', 'Prelim'),
+        ('midterm', 'Midterm'),
+        ('final', 'Final'),
+    ]
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name="grades")
     score = models.FloatField()
     passed = models.BooleanField(default=False)
-
+    period = models.CharField(max_length=7, choices=PERIOD_CHOICES, default='prelim')  # New field for period
     def __str__(self):
         return f"{self.user.username} - {self.quiz.name} - {self.score}"
 
@@ -82,11 +87,17 @@ class Materials(models.Model):
         super().save(*args, **kwargs)
 
 class ExamResult(models.Model):
+    PERIOD_CHOICES = [
+        ('prelim', 'Prelim'),
+        ('midterm', 'Midterm'),
+        ('final', 'Final'),
+    ]
     student = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, limit_choices_to={'is_student': True})
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="exam_results")
     exam_name = models.CharField(max_length=255)
     score = models.FloatField()
     total_items = models.FloatField()
     date_taken = models.DateField(auto_now_add=True)
+    period = models.CharField(max_length=7, choices=PERIOD_CHOICES, default='prelim')  # New field for period
     professor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, limit_choices_to={'is_professor': True}, related_name="added_results")
 # Create your models here.

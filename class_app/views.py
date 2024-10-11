@@ -42,7 +42,9 @@ def course_view(request, pk):
     # Filter grades for quizzes related to this course, and get the quiz name and score
     results = Grade.objects.filter(quiz__course=obj, user=request.user).values('quiz__name', 'score')
     results_prof = Grade.objects.filter(quiz__course=obj).values('user__username', 'quiz__name', 'score', 'passed')
-
+    prelim_grades = get_prelim_grades(user=request.user)
+    midterm_grades = get_midterm_grades(user=request.user)
+    final_grades = get_final_grades(user=request.user)
     # Pass context to the template
     context = {
         'obj': obj,
@@ -53,6 +55,9 @@ def course_view(request, pk):
         'exam_results': exam_results,  # Passing the exam results to the template'
         'exam_results_prof': exam_results_prof,  # Passing the exam results to the template'
         'results_prof': results_prof,
+        'prelim_grades': prelim_grades,
+        'midterm_grades': midterm_grades,
+        'final_grades': final_grades
     }
 
     return render(request, 'course.html', context)
@@ -258,3 +263,51 @@ def add_exam_result_view(request, course_pk):
         form = ExamResultForm(initial={'course': course})
 
     return render(request, 'add_exam_result.html', {'form': form, 'course': course})
+
+
+def calculate_quiz_grade(grades):
+    total_score = sum([grade.score for grade in grades])
+    total_items = sum([grade.quiz.no_of_questions for grade in grades])
+
+    if total_items == 0:
+        return 0
+
+    # Formula: [(score1 + score2) / (total1 + total2)] * 60
+    return (total_score / total_items) * 60
+
+
+def calculate_exam_grade(exams):
+    total_score = sum([exam.score for exam in exams])
+    total_items = sum([exam.total_items for exam in exams])
+
+    if total_items == 0:
+        return 0
+
+    # Formula: [(score1 + score2) / (total1 + total2)] * 40
+    return (total_score / total_items) * 40
+
+
+def get_grades_by_period(user, period):
+    quizzes = Grade.objects.filter(user=user, period=period)
+    exams = ExamResult.objects.filter(student=user, period=period)
+
+    quiz_grade = calculate_quiz_grade(quizzes)
+    exam_grade = calculate_exam_grade(exams)
+
+    final_grade = quiz_grade + exam_grade
+
+    # Debugging output
+    print(f"Grades for {period}: Quiz={quiz_grade}, Exam={exam_grade}, Final={final_grade}")
+
+    return final_grade
+def get_prelim_grades(user):
+    return get_grades_by_period(user, 'prelim')
+
+def get_midterm_grades(user):
+    return get_grades_by_period(user, 'midterm')
+
+def get_final_grades(user):
+    return get_grades_by_period(user, 'final')
+
+
+

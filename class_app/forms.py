@@ -16,4 +16,18 @@ class Materialsform(ModelForm):
 class ExamResultForm(forms.ModelForm):
     class Meta:
         model = ExamResult
-        fields = ['student', 'exam_name', 'score', 'total_items']
+        fields = ['student', 'exam_name', 'score', 'total_items','period']
+        widgets = {
+            'period': forms.Select(choices=Grade.PERIOD_CHOICES),
+        }
+
+    from django import forms
+    from .models import Grade
+
+    class GradeForm(forms.ModelForm):
+        class Meta:
+            model = Grade
+            fields = ['user', 'quiz', 'score', 'passed', 'period']  # Added 'period' field
+            widgets = {
+                'period': forms.Select(choices=Grade.PERIOD_CHOICES),
+            }

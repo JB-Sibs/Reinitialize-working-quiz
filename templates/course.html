@@ -213,4 +213,36 @@
     
 {% endif %}
     </div>
+   <table>
+    <thead>
+        <tr>
+            <th>Period</th>
+            <th>Computed Grade</th>
+            <th>Submitted Grade</th>
+            <th>Date/Time Finalized</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Prelim</td>
+            <td>{{ prelim_grades|default:"N/A" }}</td>
+            <td>2.00</td>
+            <td>2024-08-09 06:46</td>
+        </tr>
+        <tr>
+            <td>Midterm</td>
+            <td>{{ midterm_grades|default:"N/A" }}</td>
+            <td>2.00</td>
+            <td>2024-09-22 22:26</td>
+        </tr>
+        <tr>
+            <td>Final</td>
+            <td>{{ final_grades|default:"N/A" }}</td>
+            <td>-</td>
+            <td>-</td>
+        </tr>
+    </tbody>
+</table>
+
+
 {% endblock %}
