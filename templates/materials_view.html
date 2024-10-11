@@ -129,9 +129,17 @@
                         <li class="module-item">
                             <i class="module-icon">📄</i>
                             <h3>{{ material.title }}</h3>
-                            <p>{{ material.content }}</p>
-                            <p><small>Posted on: {{ material.posted_on|date:"F d, Y" }}</small></p>
-                        </li>
+                            {% if material.type in "png jpg jpeg" %}
+                                <!-- Image Preview -->
+                                <img src="{{ material.url }}" alt="{{ material.title }}" style="max-width: 100%; height: auto;" />
+                            {% elif material.type in "pdf doc docx" %}
+                                <p><a href="{{ material.url }}" download>Download File</a></p>
+                            {% else %}
+                                <!-- Fallback for other file types -->
+                                <p><a href="{{ material.url }}" target="_blank">Download File</a></p>
+                            {% endif %}
+                        
+                        <p><small>Posted on: {{ material.posted_on|date:"F d, Y" }}</small></p>
                     {% endfor %}
                 </ul>
             </div>

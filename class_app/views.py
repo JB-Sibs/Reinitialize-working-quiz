@@ -48,11 +48,22 @@ def course_view(request, pk):
     midterm_grades = get_midterm_grades(user=request.user)
     final_grades = get_final_grades(user=request.user)
 
+    # Create a list of materials with their types
+    material_info = []
+    for material in materials:
+        file_extension = material.content.url.split('.')[-1].lower()  # Get the file extension
+        material_info.append({
+            'title': material.title,
+            'url': material.content.url,
+            'type': file_extension,
+            'posted_on': material.created_on,
+        })
+
     # Pass context to the template
     context = {
         'obj': obj,
         'announcements': announcements,
-        'materials': materials,
+        'materials': material_info,
         'quizzes': quizzes,
         'results': results,  # Passing both the quiz name and score
         'exam_results': exam_results,  # Passing the exam results to the template
@@ -85,12 +96,23 @@ def all_materials_view(request):
     # Fetch all courses for the current user through Enrollment
     user_courses = Course.objects.filter(enrollment__user=request.user)
 
-    # Fetch all announcements related to those courses
+    # Fetch all materials related to those courses
     materials = Materials.objects.filter(course__in=user_courses)
+
+    # Create a list of materials with their types
+    material_info = []
+    for material in materials:
+        file_extension = material.content.url.split('.')[-1].lower()  # Get the file extension
+        material_info.append({
+            'title': material.title,
+            'url': material.content.url,
+            'type': file_extension,
+            'posted_on': material.created_on,
+        })
 
     # Pass context to the template
     context = {
-        'materials': materials,
+        'materials': material_info,  # Use the processed list
     }
 
     return render(request, 'all_materials.html', context)
@@ -242,11 +264,24 @@ def announcement_view(request, pk):
 
 def materials_view(request, pk):
     obj = Course.objects.get(pk=pk)
-    materials = Materials.objects.filter(course=obj)
+    materials = Materials.objects.filter(course_id=pk)
+
+    # Create a list of materials with their types
+    material_info = []
+    for material in materials:
+        file_extension = material.content.url.split('.')[-1].lower()  # Get the file extension
+        material_info.append({
+            'title': material.title,
+            'url': material.content.url,
+            'type': file_extension,
+            'posted_on': material.created_on,
+        })
+
     context = {
-        'obj': obj,
-        'materials': materials,
+        'materials': material_info,
+        'obj': obj,  # Your course object or other context data
     }
+
     return render(request, 'materials_view.html', context)
 
 

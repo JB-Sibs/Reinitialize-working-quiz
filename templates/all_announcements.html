@@ -13,6 +13,7 @@
                         <p><strong>Course:</strong> {{ announcement.course.name }}</p> <!-- Display course name -->
                         <div class="announcement-item">
                             <p>{{ announcement.content }}</p>
+                            <p><small>Posted on: {{ announcement.posted_on|date:"F d, Y" }}</small></p>
                         </div>
                     </div>
                 </li>

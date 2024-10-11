@@ -34,6 +34,7 @@
                         <div class="announcement-item">
                             <p>{{ announcement.content }}</p>
                         </div>
+                    <p><small>Posted on: {{ announcement.posted_on|date:"F d, Y" }}</small></p>
                     </div>
                 </li>
             {% endfor %}
@@ -47,16 +48,28 @@
             </a>
         {% endif %}
 
-        <ul class="content-container">
-            {% for material in materials %}
-                <li>
-                    <div class="announcement-container">
-                        <h3>{{ material.title }}</h3>
-                        <p><a href="{{ material.content.url }}" target="_blank">Download PDF</a></p>
-                    </div>
-                </li>
-            {% endfor %}
-        </ul>
+<div class="module-section">
+            <div class="module-content">
+                <ul class="materials-list">
+                    {% for material in materials %}
+                        <li class="module-item">
+                            <i class="module-icon">📄</i>
+                            <h3>{{ material.title }}</h3>
+                            {% if material.type in "png jpg jpeg" %}
+                                <!-- Image Preview -->
+                                <img src="{{ material.url }}" alt="{{ material.title }}" style="max-width: 100%; height: auto;" />
+                            {% elif material.type in "pdf doc docx" %}
+                                <p><a href="{{ material.url }}" download>Download File</a></p>
+                            {% else %}
+                                <!-- Fallback for other file types -->
+                                <p><a href="{{ material.url }}" target="_blank">Download File</a></p>
+                            {% endif %}
+                        
+                        <p><small>Posted on: {{ material.posted_on|date:"F d, Y" }}</small></p>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
 
         <!-- Quizzes Section -->
       <!-- Quizzes Section -->
