@@ -6,7 +6,7 @@ from django.contrib import messages
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
 
-from .forms import Announcementform, Materialsform, ExamResultForm
+from .forms import Announcementform, Materialsform, ExamResultForm, EnrollmentForm
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import PermissionDenied
 
@@ -313,5 +313,30 @@ def get_midterm_grades(user):
 def get_final_grades(user):
     return get_grades_by_period(user, 'final')
 
+# Helper function to check if the user is a professor
+def professor_required(user):
+    if not user.is_professor:
+        raise PermissionDenied
+    return True
 
+@login_required
+@user_passes_test(professor_required)
+def enroll_student_view(request, course_pk):
+    course = get_object_or_404(Course, pk=course_pk)
+
+    if request.method == 'POST':
+        form = EnrollmentForm(request.POST)
+        if form.is_valid():
+            enrollment = form.save(commit=False)
+            enrollment.course = course  # Assign the course
+            enrollment.save()  # Save the enrollment
+            return redirect('class:course_view', pk=course.pk)  # Redirect to the course view
+    else:
+        form = EnrollmentForm()
+
+    context = {
+        'course': course,
+        'form': form
+    }
+    return render(request, 'enroll_student.html', context)
 

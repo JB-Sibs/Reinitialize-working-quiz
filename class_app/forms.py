@@ -31,3 +31,16 @@ class ExamResultForm(forms.ModelForm):
             widgets = {
                 'period': forms.Select(choices=Grade.PERIOD_CHOICES),
             }
+
+class EnrollmentForm(forms.ModelForm):
+    class Meta:
+        model = Enrollment
+        fields = ['user']  # Only selecting the student to enroll
+        widgets = {
+            'user': forms.Select(attrs={'class': 'form-control'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(EnrollmentForm, self).__init__(*args, **kwargs)
+        # Limit the choices to users who are students
+        self.fields['user'].queryset = User.objects.filter(is_student=True)

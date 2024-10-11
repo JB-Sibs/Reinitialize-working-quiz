@@ -215,6 +215,7 @@
     
 {% endif %}
     </div>
+    {% if user.is_student %}
    <table>
     <thead>
         <tr>
@@ -245,5 +246,10 @@
         </tr>
     </tbody>
 </table>
-
+    {% endif %}
+{% if user.is_professor %}
+    <a href="{% url 'class:enroll_student' obj.pk %}">
+        <button type="button" class="custom-btn">Enroll Student</button>
+    </a>
+{% endif %}
 {% endblock %}

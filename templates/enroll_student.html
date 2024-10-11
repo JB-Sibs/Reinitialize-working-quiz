@@ -1,0 +1,14 @@
+{% extends 'taskbar.html' %}
+{% block content %}
+    <h1>Enroll Student in {{ course.name }}</h1>
+    
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Enroll Student</button>
+    </form>
+
+    <a href="{% url 'class:course_view' course.pk %}">
+        <button type="button" class="btn btn-secondary">Cancel</button>
+    </a>
+{% endblock %}
