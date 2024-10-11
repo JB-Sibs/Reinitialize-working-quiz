@@ -53,10 +53,6 @@ def quiz_data_view(request, course_pk, quiz_pk):
     except Exception as e:
         print(f"Error: {e}")  # Print error to server logs for debugging
         return JsonResponse({'error': 'An error occurred'}, status=500)
-
-
-
-
 def save_quiz_view(request, course_pk, quiz_pk):
     if request.method == 'POST' and request.headers.get('x-requested-with') == 'XMLHttpRequest':
         try:
@@ -128,17 +124,18 @@ def save_quiz_view(request, course_pk, quiz_pk):
             # Determine if the user passed the quiz
             passed = final_score >= quiz.req_score_to_pass
 
-            # Save the score and result in the Grade model
+            # Save the score and result in the Grade model with the quiz's period
             grade, created = Grade.objects.get_or_create(
                 user=user,
                 quiz=quiz,
-                defaults={'score': score, 'passed': passed}
+                defaults={'score': score, 'passed': passed, 'period': quiz.period}  # Save the period from the quiz
             )
 
             if not created:
                 # If a Grade object already exists, update it
                 grade.score = score
                 grade.passed = passed
+                grade.period = quiz.period  # Ensure period is updated if necessary
                 grade.save()
 
             return JsonResponse({
@@ -158,6 +155,7 @@ def save_quiz_view(request, course_pk, quiz_pk):
 
     # If the request isn't a valid POST, return an error
     return JsonResponse({'error': 'Invalid request'}, status=400)
+
 
 def create_quiz_view(request, course_pk):
     course = get_object_or_404(Course, pk=course_pk)  # Get the course by its primary key

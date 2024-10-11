@@ -37,14 +37,17 @@ def course_view(request, pk):
     quizzes = Quiz.objects.filter(course=obj)
     # Fetch exam results for the current user and course
     exam_results = ExamResult.objects.filter(course=obj, student=request.user)
-    exam_results_prof= ExamResult.objects.filter(course=obj)
+    exam_results_prof = ExamResult.objects.filter(course=obj)
 
     # Filter grades for quizzes related to this course, and get the quiz name and score
-    results = Grade.objects.filter(quiz__course=obj, user=request.user).values('quiz__name', 'score')
-    results_prof = Grade.objects.filter(quiz__course=obj).values('user__username', 'quiz__name', 'score', 'passed')
+    results = Grade.objects.filter(quiz__course=obj, user=request.user).values('quiz__name', 'score', 'period')
+    results_prof = Grade.objects.filter(quiz__course=obj).values('user__username', 'quiz__name', 'score', 'passed', 'period')
+
+    # Get grades filtered by period
     prelim_grades = get_prelim_grades(user=request.user)
     midterm_grades = get_midterm_grades(user=request.user)
     final_grades = get_final_grades(user=request.user)
+
     # Pass context to the template
     context = {
         'obj': obj,
@@ -52,8 +55,8 @@ def course_view(request, pk):
         'materials': materials,
         'quizzes': quizzes,
         'results': results,  # Passing both the quiz name and score
-        'exam_results': exam_results,  # Passing the exam results to the template'
-        'exam_results_prof': exam_results_prof,  # Passing the exam results to the template'
+        'exam_results': exam_results,  # Passing the exam results to the template
+        'exam_results_prof': exam_results_prof,  # Passing the exam results to the template
         'results_prof': results_prof,
         'prelim_grades': prelim_grades,
         'midterm_grades': midterm_grades,
@@ -61,6 +64,7 @@ def course_view(request, pk):
     }
 
     return render(request, 'course.html', context)
+
 
 def all_announcements_view(request):
     # Fetch all courses for the current user through Enrollment
