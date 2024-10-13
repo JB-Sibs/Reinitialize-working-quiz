@@ -115,7 +115,7 @@ def save_quiz_view(request, course_pk, quiz_pk):
             passed = final_score >= quiz.req_score_to_pass
 
             # Save the grade
-            Grade.objects.create(user=user, quiz=quiz, score=final_score, passed=passed)
+            Grade.objects.create(user=user, quiz=quiz, score=score, passed=passed)
 
             return JsonResponse({
                 'success': True,

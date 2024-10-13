@@ -89,6 +89,7 @@
         data-questions="{{ quiz.no_of_questions }}"
         data-time="{{ quiz.time }}"
         data-pass="{{ quiz.req_score_to_pass }}"
+        attempts_left="{{ quiz.attempts_allowed }}"
         data-bs-toggle="modal"
         data-bs-target="#quizStartModal">
         {{ quiz.name }}
@@ -111,7 +112,23 @@
         </div>
     </div>
 </div>
-
+<!-- Modal for showing no attempts left -->
+<div class="modal fade" id="noAttemptsModal" tabindex="-1" aria-labelledby="noAttemptsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="noAttemptsModalLabel">No Attempts Left</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>You have no attempts left for this quiz. Please contact your instructor for further assistance.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="returnToCourseBtn">Return to Course</button>
+            </div>
+        </div>
+    </div>
+</div>
 <!-- Student View -->
 {% if user.is_student %}
 <h2>Quiz Scores</h2>

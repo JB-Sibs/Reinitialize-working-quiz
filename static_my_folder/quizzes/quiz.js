@@ -15,21 +15,27 @@ document.addEventListener('DOMContentLoaded', function () {
     let timeLimit = parseInt(timeLimitElement.innerText) * 60;  // Convert to seconds
     let timerElement = document.getElementById('time_display');
 
+    // Check if there is stored time in localStorage
+    let storedTime = localStorage.getItem('remainingTime');
+    if (storedTime !== null) {
+        timeLimit = parseInt(storedTime);  // Retrieve stored time if available
+    }
+
     let timer = setInterval(() => {
         if (timeLimit <= 0) {
             clearInterval(timer);
-            alert("Time's up! Submitting your quiz automatically...");
-            disableQuizInputs();  // Disable inputs when time's up
-
-            if (!quizSubmitted) {  // Prevent multiple submissions
+            localStorage.removeItem('remainingTime'); // Clear storage when time is up
+            if (!quizSubmitted) {
                 quizSubmitted = true;
-                sendData();  // Submit quiz data via AJAX
+                alert("Time's up! Submitting your quiz automatically...");
+                sendData();
             }
         } else {
             timeLimit -= 1;
             let minutes = Math.floor(timeLimit / 60);
             let seconds = timeLimit % 60;
             timerElement.innerText = `Time Left: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+            localStorage.setItem('remainingTime', timeLimit);  // Store the remaining time
         }
     }, 1000);
 
@@ -62,8 +68,9 @@ document.addEventListener('DOMContentLoaded', function () {
     if (quizForm) {
         quizForm.addEventListener('submit', function (e) {
             e.preventDefault();
-            if (!quizSubmitted) {  // Prevent multiple submissions
+            if (!quizSubmitted) {
                 quizSubmitted = true;
+                localStorage.removeItem('remainingTime');  // Clear the stored time upon submission
                 sendData();
             }
         });
@@ -71,6 +78,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Send quiz form data via AJAX
     function sendData() {
+        disableQuizInputs(); // Disable inputs to prevent further changes
         const csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
         const answers = getSelectedAnswers();
         const data = {
@@ -83,19 +91,57 @@ document.addEventListener('DOMContentLoaded', function () {
             url: dataUrl_save,
             data: data,
             success: function (response) {
-                console.log('Quiz submission response:', response);
-                handleQuizResult(response);
-                setTimeout(() => {
-                    window.location.href = `/course/${courseId}/`;
-                }, 3000);
-            },
+                    const results = response.results;
+                    const passingScore = response.passing_score;
+                    quizForm.classList.add('not-visible');
+
+                    let resultHTML = '';
+                    let totalQuestions = 0;
+                    let correctAnswers = 0;
+
+                    results.forEach(res => {
+                        Object.entries(res).forEach(([question, resp]) => {
+                            const answer = data[question] || 'No answer provided';
+                            const correct = resp['correct_answer'] || 'No correct answer provided';
+
+                            totalQuestions++;
+
+                            if (resp.correct) {
+                                correctAnswers++;
+                                resultHTML += `
+                                    <div class="p-3 my-3 bg-success">
+                                        <b>Question:</b> ${question}<br>
+                                        Correct Answer: ${correct}<br>
+                                        Your Answer: ${answer}
+                                    </div>`;
+                            } else {
+                                resultHTML += `
+                                    <div class="p-3 my-3 bg-danger">
+                                        <b>Question:</b> ${question}<br>
+                                        Correct Answer: ${correct}<br>
+                                        Your Answer: ${answer}
+                                    </div>`;
+                            }
+                        });
+                    });
+
+                    const score = (correctAnswers / totalQuestions) * 100;
+                    let resultMessage = score >= passingScore
+                        ? 'Congratulations! You passed the quiz!'
+                        : 'Unfortunately, you did not pass. Try again!';
+
+                    document.getElementById('quizScore').innerText = score.toFixed(2);
+                    document.getElementById('quizResultMessage').innerText = resultMessage;
+                    document.getElementById('quizResultsDetails').innerHTML = resultHTML;
+
+                    resultModal.show();
+                },
             error: function (error) {
                 console.error('Error submitting quiz data:', error);
             }
         });
     }
 
-    // Helper function to collect selected answers
     function getSelectedAnswers() {
         const answers = {};
         const answerElements = document.querySelectorAll('.ans:checked');
@@ -106,7 +152,6 @@ document.addEventListener('DOMContentLoaded', function () {
         return answers;
     }
 
-    // Disable inputs when time runs out
     function disableQuizInputs() {
         const inputs = document.querySelectorAll('input.ans');
         inputs.forEach(input => {
@@ -114,8 +159,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Handle quiz result display
-    function handleQuizResult(response) {
-        // Same code as before for displaying results
-    }
+    returnToCourseBtn.addEventListener('click', function() {
+        window.location.href = `/course/${courseId}/`;
+    });
 });
