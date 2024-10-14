@@ -15,6 +15,96 @@ from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404
 from quizzes.models import Quiz  # Import the Quiz model
 
+
+def calculate_quiz_grade(grades):
+    total_score = sum([grade.score for grade in grades])
+    total_items = sum([grade.quiz.no_of_questions for grade in grades])
+
+    if total_items == 0:
+        return 0
+
+    # Formula: [(score1 + score2) / (total1 + total2)] * 60
+    return (total_score / total_items) * 60
+
+
+def calculate_exam_grade(exams):
+    total_score = sum([exam.score for exam in exams])
+    total_items = sum([exam.total_items for exam in exams])
+
+    if total_items == 0:
+        return 0
+
+    # Formula: [(score1 + score2) / (total1 + total2)] * 40
+    return (total_score / total_items) * 40
+
+
+
+def get_prelim_grades(user):
+    return get_grades_by_period(user, 'prelim')
+
+
+def get_midterm_grades(user):
+    return get_grades_by_period(user, 'midterm')
+
+
+def get_final_grades(user):
+    return get_grades_by_period(user, 'final')
+
+
+def get_transmuted_grade_and_classification(final_grade):
+    """
+    Maps a computed average to the corresponding transmuted grade and general classification.
+    """
+    if 97.0000 <= final_grade <= 100.0000:
+        return 1.00, "Outstanding"
+    elif 94.0000 <= final_grade < 97.0000:
+        return 1.25, "Excellent"
+    elif 91.0000 <= final_grade < 94.0000:
+        return 1.50, "Superior"
+    elif 88.0000 <= final_grade < 91.0000:
+        return 1.75, "Very Good"
+    elif 85.0000 <= final_grade < 88.0000:
+        return 2.00, "Good"
+    elif 82.0000 <= final_grade < 85.0000:
+        return 2.25, "Satisfactory"
+    elif 79.0000 <= final_grade < 82.0000:
+        return 2.50, "Fairly Satisfactory"
+    elif 76.0000 <= final_grade < 79.0000:
+        return 2.75, "Fair"
+    elif 75.0000 <= final_grade < 76.0000:
+        return 3.00, "Passed"
+    else:
+        return 5.00, "Failed"  # Assign 5.00 for failed grades below 75
+
+
+def get_grades_by_period(user, period):
+    # Retrieve grades and exams based on the user and period
+    quizzes = Grade.objects.filter(user=user, period=period)
+    exams = ExamResult.objects.filter(student=user, period=period)
+
+    # Calculate the quiz and exam grades
+    quiz_grade = calculate_quiz_grade(quizzes)
+    exam_grade = calculate_exam_grade(exams)
+
+    # Compute the final grade
+    final_grade = quiz_grade + exam_grade
+
+    # Get the transmuted grade and classification based on the final grade
+    transmuted_grade, classification = get_transmuted_grade_and_classification(final_grade)
+    print(
+        f"Computed transmuted grade: {transmuted_grade} and classification: {classification} for final grade: {final_grade}")
+
+    # Debugging: Print out the computed grades for verification
+    print(f"Grades for {period}: Quiz={quiz_grade}, Exam={exam_grade}, Final={final_grade}, Transmuted={transmuted_grade}")
+
+    # Iterate through the quizzes to update transmuted_grade and classification fields
+    for grade in quizzes:
+        grade.transmuted_grade = transmuted_grade  # Assign the transmuted grade
+        grade.classification = classification  # Assign the classification
+        grade.save()  # Save the changes to the database
+
+    return final_grade, transmuted_grade, classification
+
 def admin_custom_view(request):
     courses = Course.objects.all()
 
@@ -47,18 +137,20 @@ def course_view(request, pk):
     announcements = Announcement.objects.filter(course=obj)
     materials = Materials.objects.filter(course=obj)
     quizzes = Quiz.objects.filter(course=obj)
+
     # Fetch exam results for the current user and course
     exam_results = ExamResult.objects.filter(course=obj, student=request.user)
     exam_results_prof = ExamResult.objects.filter(course=obj)
 
     # Filter grades for quizzes related to this course, and get the quiz name and score
     results = Grade.objects.filter(quiz__course=obj, user=request.user).values('quiz__name', 'score', 'period')
-    results_prof = Grade.objects.filter(quiz__course=obj).values('user__username', 'quiz__name', 'score', 'passed', 'period')
+    results_prof = Grade.objects.filter(quiz__course=obj).values('user__username', 'quiz__name', 'score', 'passed',
+                                                                 'period')
 
-    # Get grades filtered by period
-    prelim_grades = get_prelim_grades(user=request.user)
-    midterm_grades = get_midterm_grades(user=request.user)
-    final_grades = get_final_grades(user=request.user)
+    # Get grades filtered by period for the logged-in user
+    prelim_final, prelim_transmuted, prelim_classification = get_prelim_grades(user=request.user)
+    midterm_final, midterm_transmuted, midterm_classification = get_midterm_grades(user=request.user)
+    final_final, final_transmuted, final_classification = get_final_grades(user=request.user)
 
     # Create a list of materials with their types
     material_info = []
@@ -71,7 +163,7 @@ def course_view(request, pk):
             'posted_on': material.created_on,
         })
 
-    # Pass context to the template
+    # Pass context to the template, including the grades
     context = {
         'obj': obj,
         'announcements': announcements,
@@ -81,9 +173,21 @@ def course_view(request, pk):
         'exam_results': exam_results,  # Passing the exam results to the template
         'exam_results_prof': exam_results_prof,  # Passing the exam results to the template
         'results_prof': results_prof,
-        'prelim_grades': prelim_grades,
-        'midterm_grades': midterm_grades,
-        'final_grades': final_grades
+
+        # Prelim grade information
+        'prelim_final': prelim_final,
+        'prelim_transmuted': prelim_transmuted,
+        'prelim_classification': prelim_classification,
+
+        # Midterm grade information
+        'midterm_final': midterm_final,
+        'midterm_transmuted': midterm_transmuted,
+        'midterm_classification': midterm_classification,
+
+        # Final grade information
+        'final_final': final_final,
+        'final_transmuted': final_transmuted,
+        'final_classification': final_classification,
     }
 
     return render(request, 'course.html', context)
@@ -314,51 +418,6 @@ def add_exam_result_view(request, course_pk):
         form = ExamResultForm(initial={'course': course})
 
     return render(request, 'add_exam_result.html', {'form': form, 'course': course})
-
-
-def calculate_quiz_grade(grades):
-    total_score = sum([grade.score for grade in grades])
-    total_items = sum([grade.quiz.no_of_questions for grade in grades])
-
-    if total_items == 0:
-        return 0
-
-    # Formula: [(score1 + score2) / (total1 + total2)] * 60
-    return (total_score / total_items) * 60
-
-
-def calculate_exam_grade(exams):
-    total_score = sum([exam.score for exam in exams])
-    total_items = sum([exam.total_items for exam in exams])
-
-    if total_items == 0:
-        return 0
-
-    # Formula: [(score1 + score2) / (total1 + total2)] * 40
-    return (total_score / total_items) * 40
-
-
-def get_grades_by_period(user, period):
-    quizzes = Grade.objects.filter(user=user, period=period)
-    exams = ExamResult.objects.filter(student=user, period=period)
-
-    quiz_grade = calculate_quiz_grade(quizzes)
-    exam_grade = calculate_exam_grade(exams)
-
-    final_grade = quiz_grade + exam_grade
-
-    # Debugging output
-    print(f"Grades for {period}: Quiz={quiz_grade}, Exam={exam_grade}, Final={final_grade}")
-
-    return final_grade
-def get_prelim_grades(user):
-    return get_grades_by_period(user, 'prelim')
-
-def get_midterm_grades(user):
-    return get_grades_by_period(user, 'midterm')
-
-def get_final_grades(user):
-    return get_grades_by_period(user, 'final')
 
 
 

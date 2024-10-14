@@ -66,6 +66,8 @@ class Grade(models.Model):
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name="grades")
     score = models.FloatField()
     passed = models.BooleanField(default=False)
+    transmuted_grade = models.FloatField(null=True, blank=True)
+    classification = models.CharField(max_length=20, blank=True)  # New field for classification
     period = models.CharField(max_length=7, choices=PERIOD_CHOICES, default='prelim')  # New field for period
     def __str__(self):
         return f"{self.user.username} - {self.quiz.name} - {self.score}"
