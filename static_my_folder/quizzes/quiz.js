@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', function () {
     console.log('JavaScript file loaded!');
     const currentUrl = window.location.href.split('?')[0];
-    const dataUrl = `${currentUrl.endsWith('/') ? currentUrl : currentUrl + '/'}data`;
+    const dataUrl = `${currentUrl.endsWith('/') ? currentUrl : currentUrl + '/'}data/`;
     const dataUrl_save = `${currentUrl.endsWith('/') ? currentUrl : currentUrl + '/'}save/`;
     const quizBox = document.getElementById('quiz_box');
     const resultModal = new bootstrap.Modal(document.getElementById('resultModal'));

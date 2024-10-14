@@ -45,29 +45,35 @@ def quiz_view(request, course_pk, quiz_pk):
     }
 
     return render(request, 'quiz.html', context)
+
+
 def quiz_data_view(request, course_pk, quiz_pk):
     try:
         # Fetch the quiz and its questions
         quiz = Quiz.objects.get(pk=quiz_pk)
         questions = []
-        for q in quiz.get_questions():
-            answers = [a.text for a in q.get_answers()]
+
+        # Loop through the questions and collect answers
+        for q in quiz.get_questions():  # Make sure `get_questions()` is defined in your `Quiz` model.
+            answers = [a.text for a in q.get_answers()]  # Ensure `get_answers()` is defined in `Question` model.
             questions.append({str(q): answers})
 
         # Return JSON response
         return JsonResponse({
             'data': questions,
-            'time': quiz.time,
+            'time': quiz.time_limit,  # Ensure `time` is an attribute of `Quiz`.
         })
 
     # Handle the case where the quiz doesn't exist
     except Quiz.DoesNotExist:
         return JsonResponse({'error': 'Quiz not found'}, status=404)
 
-    # Catch other exceptions
+    # Catch other exceptions and log them for debugging
     except Exception as e:
-        print(f"Error: {e}")  # Print error to server logs for debugging
-        return JsonResponse({'error': 'An error occurred'}, status=500)
+        print(f"Error: {e}")  # Print the error to server logs for debugging
+        return JsonResponse({'error': 'An internal server error occurred'}, status=500)
+
+
 def save_quiz_view(request, course_pk, quiz_pk):
     if request.method == 'POST' and request.headers.get('x-requested-with') == 'XMLHttpRequest':
         try:

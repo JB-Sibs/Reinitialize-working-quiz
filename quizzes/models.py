@@ -14,7 +14,6 @@ class Quiz(models.Model):
     course = models.ForeignKey('class_app.Course', on_delete=models.CASCADE)
     topic = models.CharField(max_length=120)
     no_of_questions = models.IntegerField()
-    time = models.IntegerField(help_text="Duration of the quiz in minutes")
     req_score_to_pass = models.FloatField(help_text="Score to pass")
     period = models.CharField(max_length=7, choices=PERIOD_CHOICES, default='prelim')
     attempts_allowed = models.IntegerField(default=1, help_text="Number of attempts allowed")

@@ -3,6 +3,7 @@ from django.conf import settings
 from django.contrib.auth.models import AbstractUser, Group, Permission, User
 from django.core.exceptions import PermissionDenied
 from quizzes.models import Quiz
+
 class Course(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField()
@@ -42,7 +43,7 @@ class User(AbstractUser):
     is_professor = models.BooleanField('is professor', default=False)
     is_student = models.BooleanField('is student', default=False)
     email = models.EmailField(unique=True, blank=True, null=True,)
-
+    is_admin = models.BooleanField('Is admin', default=False)  # New field for admin users
 
     # def has_perms(self, perm_list):
     #     return True

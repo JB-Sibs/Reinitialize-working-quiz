@@ -20,7 +20,7 @@
     <div class="content-container">
         <h1>{{ obj.name }} Announcements</h1>
 
-        {% if user.is_professor %}
+        {% if user.is_professor or user.is_admin %}
             <a href="{% url 'class:add_announcement' obj.pk %}">
                 <button type="button" class="custom-btn">Add Announcement</button>
             </a>
@@ -42,7 +42,7 @@
 
         <h1>{{ obj.name }} Materials</h1>
 
-        {% if user.is_professor %}
+        {% if user.is_professor or user.is_admin %}
             <a href="{% url 'class:add_module' obj.pk %}">
                 <button type="button" class="custom-btn">Add Module</button>
             </a>
@@ -64,7 +64,7 @@
                                 <!-- Fallback for other file types -->
                                 <p><a href="{{ material.url }}" target="_blank">Download File</a></p>
                             {% endif %}
-                        
+
                         <p><small>Posted on: {{ material.posted_on|date:"F d, Y" }}</small></p>
                     {% endfor %}
                 </ul>
@@ -76,7 +76,7 @@
 <h1>{{ obj.name }} Quizzes</h1>
 <hr>
 
-{% if user.is_professor %}
+{% if user.is_professor or user.is_admin %}
     <a href="{% url 'quizzes:create_quiz' obj.pk %}">
         <button type="button" class="custom-btn">Add Quiz</button>
     </a>
@@ -87,7 +87,7 @@
         data-pk="{{ quiz.pk }}"
         data-quiz="{{ quiz.name }}"
         data-questions="{{ quiz.no_of_questions }}"
-        data-time="{{ quiz.time }}"
+        data-time="{{ quiz.time_limit }}"
         data-pass="{{ quiz.req_score_to_pass }}"
         attempts_left="{{ quiz.attempts_allowed }}"
         data-bs-toggle="modal"
@@ -95,7 +95,7 @@
         {{ quiz.name }}
     </button>
 {% endfor %}
-
+{% if user.is_student %}
 <!-- Modal for Starting Quiz -->
 <div class="modal fade" id="quizStartModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -129,6 +129,7 @@
         </div>
     </div>
 </div>
+    {% endif %}
 <!-- Student View -->
 {% if user.is_student %}
 <h2>Quiz Scores</h2>
@@ -183,7 +184,7 @@
 {% endif %}
 
 <!-- Professor View -->
- {% if user.is_professor %}
+ {% if user.is_professor or user.is_admin %}
             <h2>Quiz Scores (All Students)</h2>
             <table border="1">
                 <thead>
@@ -197,7 +198,7 @@
                 <tbody>
                     {% for result in results_prof %}
                         <tr>
-                            <td>{{ result.user__username }}</td> 
+                            <td>{{ result.user__username }}</td>
                             <td>{{ result.quiz__name }}</td>
                             <td>{{ result.score }}</td>
                             <td>{{ result.passed|yesno:"Yes,No" }}</td>
@@ -242,7 +243,7 @@
 <a href="{% url 'class:add_exam_result' obj.pk %}">
     <button type="button" class="custom-btn">Add exam results</button>
 </a>
-    
+
 {% endif %}
     </div>
     {% if user.is_student %}
@@ -277,10 +278,10 @@
     </tbody>
 </table>
     {% endif %}
-{% if user.is_professor %}
+{% if user.is_professor or user.is_admin %}
     <a href="{% url 'class:enroll_student' obj.pk %}">
         <button type="button" class="custom-btn">Enroll Student</button>
     </a>
 {% endif %}
-    
+
 {% endblock %}

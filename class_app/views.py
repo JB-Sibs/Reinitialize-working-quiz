@@ -1,3 +1,4 @@
+from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import authenticate, login as auth_login, logout
 
 from django.shortcuts import render, redirect
@@ -6,14 +7,25 @@ from django.contrib import messages
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
 
-from .forms import Announcementform, Materialsform, ExamResultForm, EnrollmentForm
+from .forms import Announcementform, Materialsform, ExamResultForm, EnrollmentForm, CourseForm, EnrollmentFormAdmin, \
+    CustomUserCreationForm, AdminPasswordChangeForm
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import PermissionDenied
 
 from django.shortcuts import get_object_or_404
 from quizzes.models import Quiz  # Import the Quiz model
 
+def admin_custom_view(request):
+    courses = Course.objects.all()
 
+    # Debugging output
+    print(f"Courses fetched: {courses}")  # Check if courses are fetched
+
+    context = {
+        'courses': courses
+    }
+
+    return render(request, 'admin_dashboard.html', context)
 
 
 def home_view(request):
@@ -152,10 +164,7 @@ def activities_view(request, pk):
     return render(request, 'activities_view.html', context)
 
 def professor_dashboard(request):
-
     professor = request.user
-
-
     courses = Enrollment.objects.filter(user=professor)
 
     context = {
@@ -178,6 +187,9 @@ def login(request):
         elif user is not None and user.is_professor:
             auth_login(request, user)
             return redirect('class:professor_dashboard')
+        elif user is not None and user.is_admin:
+            auth_login(request, user)
+            return redirect('class:admin_custom_view')
         else:
             messages.error(request, "Invalid username or password.")  # Add an error message
             return render(request, 'login.html')  # Render the login page again with an error
@@ -191,7 +203,7 @@ def logout_view(request):
 
 
 def professor_required(user):
-    if not user.is_professor:
+    if not (user.is_professor or user.is_admin):
         raise PermissionDenied
     return True
 
@@ -348,11 +360,7 @@ def get_midterm_grades(user):
 def get_final_grades(user):
     return get_grades_by_period(user, 'final')
 
-# Helper function to check if the user is a professor
-def professor_required(user):
-    if not user.is_professor:
-        raise PermissionDenied
-    return True
+
 
 @login_required
 @user_passes_test(professor_required)
@@ -392,3 +400,85 @@ def enroll_student_view(request, course_pk):
         'enrollments': current_enrollments,
     }
     return render(request, 'enroll_student.html', context)
+
+
+# View to handle course creation and display all courses
+def course_create_view(request):
+    if request.method == 'POST':
+        form = CourseForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('class:course_create_view')  # Redirect back to the same page after saving
+    else:
+        form = CourseForm()
+
+    # Fetch all courses to display in the template
+    courses = Course.objects.all()
+
+    return render(request, 'course_form.html', {'form': form, 'courses': courses})
+
+
+# View to handle course deletion
+def course_delete_view(request, pk):
+    course = get_object_or_404(Course, pk=pk)
+
+    if request.method == 'POST':
+        course.delete()
+        return redirect('class:admin_custom_view')  # Redirect back to the main page after deletion
+
+    return render(request, 'course_confirm_delete.html', {'course': course})
+
+# View to display enrollments and delete enrollment
+def enroll_user_admin(request):
+    courses = Course.objects.all()  # Fetch all courses
+    enrollments = Enrollment.objects.select_related('course', 'user')  # Fetch all enrollments
+
+    form = EnrollmentFormAdmin()  # Instantiate the form to be visible on page load
+
+    # Handle form submission for adding an enrollment
+    if request.method == 'POST' and 'enroll' in request.POST:
+        form = EnrollmentFormAdmin(request.POST)
+        if form.is_valid():
+            form.save()
+
+            return redirect('class:admin_custom_view')
+
+    # Handle enrollment deletion
+    if request.method == 'POST' and 'delete_enrollment' in request.POST:
+        enrollment_id = request.POST.get('delete_enrollment')
+        enrollment = get_object_or_404(Enrollment, id=enrollment_id)
+        enrollment.delete()
+
+        return redirect('class:admin_custom_view')
+
+    context = {
+        'courses': courses,
+        'enrollments': enrollments,
+        'form': form,  # Always pass the form to the template
+    }
+    return render(request, 'enroll_user_admin.html', context)
+
+def register(request):
+    if request.method == 'POST':
+        form = CustomUserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('class:admin_custom_view')  # Replace 'login' with your actual login URL
+
+    else:
+        form = CustomUserCreationForm()
+
+    return render(request, 'register.html', {'form': form})
+
+@login_required
+def edit_password(request):
+    if request.method == 'POST':
+        form = AdminPasswordChangeForm(request.POST)
+        if form.is_valid():
+            form.save()
+
+            return redirect('class:admin_custom_view')  # Redirect to avoid form re-submission
+    else:
+        form = AdminPasswordChangeForm()
+
+    return render(request, 'password_edit.html', {'form': form})

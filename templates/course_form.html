@@ -1,0 +1,27 @@
+<!-- templates/course_form.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create a New Course</title>
+</head>
+<body>
+    <h1>Create a New Course</h1>
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Save</button>
+    </form>
+
+    <h2>Available Courses</h2>
+    <ul>
+        {% for course in courses %}
+        <li>
+            {{ course.name }}
+            <a href="{% url 'class:course_delete_view' course.pk %}">Delete</a>
+        </li>
+        {% empty %}
+        <li>No courses available.</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

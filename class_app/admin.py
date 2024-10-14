@@ -11,14 +11,14 @@ class UserAdmin(BaseUserAdmin):
     fieldsets[1] = (None, {'fields': ('email', 'first_name', 'last_name')})
 
     # Adding custom fields for 'is_professor' and 'is_student'
-    fieldsets.append((None, {'fields': ('is_professor', 'is_student')}))
+    fieldsets.append((None, {'fields': ('is_professor', 'is_student','is_admin')}))
 
     # Customize the list display
-    list_display = BaseUserAdmin.list_display + ('is_professor', 'is_student')
+    list_display = BaseUserAdmin.list_display + ('is_professor', 'is_student','is_admin')
 
     # Add custom fields to the user creation form
     add_fieldsets = BaseUserAdmin.add_fieldsets + (
-        (None, {'fields': ('email', 'is_professor', 'is_student')}),
+        (None, {'fields': ('email', 'is_professor', 'is_student','is_admin')}),
     )
 
 

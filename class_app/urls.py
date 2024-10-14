@@ -20,5 +20,11 @@ urlpatterns = [
     path('announcements/', all_announcements_view, name='all_announcements_view'),
     path('materials/', all_materials_view, name='all_materials_view'),
     path('course/<int:course_pk>/enroll/', enroll_student_view, name='enroll_student'),
+    path('custom-admin/dashboard/',admin_custom_view, name='admin_custom_view'),
+    path('course/new/',course_create_view, name='course_create_view'),
+    path('course/<int:pk>/delete/', course_delete_view, name='course_delete_view'),
+    path('custom-admin/dashboard/enroll/',enroll_user_admin, name='enroll_user_admin'),
+    path('register/', register, name='register'),
+    path('edit-password/', edit_password, name='edit_password'),
     # Additional URL patterns for other views if needed
 ]

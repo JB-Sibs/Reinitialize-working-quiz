@@ -1,0 +1,17 @@
+<!-- templates/course_confirm_delete.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Delete Course</title>
+</head>
+<body>
+    <h1>Are you sure you want to delete the course "{{ course.name }}"?</h1>
+
+    <form method="POST">
+        {% csrf_token %}
+        <button type="submit">Yes, delete</button>
+    </form>
+
+    <a href="{% url 'class:course_create_view' %}">Cancel</a>
+</body>
+</html>

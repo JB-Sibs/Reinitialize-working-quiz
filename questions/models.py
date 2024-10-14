@@ -10,11 +10,11 @@ class Question(models.Model):
         return str(self.text)
 
     def get_answers(self):
-        """Return all answers related to this question."""
+
         return self.answer_set.all()
 
     def get_correct_answer(self):
-        """Return the correct answer for this question."""
+
         correct_answer = self.answer_set.filter(correct=True).first()
         return correct_answer if correct_answer else None
 
