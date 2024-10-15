@@ -193,6 +193,9 @@ def course_view(request, pk):
     return render(request, 'course.html', context)
 
 
+
+
+
 def all_announcements_view(request):
     # Fetch all courses for the current user through Enrollment
     user_courses = Course.objects.filter(enrollment__user=request.user)
@@ -275,6 +278,57 @@ def grades_view(request, pk):
         'final_classification': final_classification,
     }
     return render(request, 'grades_view.html', context)
+
+
+def calculate_overall_quiz_grade(user):
+    quizzes = Grade.objects.filter(user=user)
+    total_score = sum([grade.score for grade in quizzes])
+    total_items = sum([grade.quiz.no_of_questions for grade in quizzes])
+
+    if total_items == 0:
+        return 0
+
+    return (total_score / total_items) * 60
+
+
+def calculate_overall_exam_grade(user):
+    exams = ExamResult.objects.filter(student=user)
+    total_score = sum([exam.score for exam in exams])
+    total_items = sum([exam.total_items for exam in exams])
+
+    if total_items == 0:
+        return 0
+
+    return (total_score / total_items) * 40
+
+def all_activities_view(request):
+    course_pk = request.GET.get('course')  # Check if a specific course is selected
+    quiz_pk = request.GET.get('quiz')  # Check if a specific quiz is selected
+
+    if course_pk and quiz_pk:
+        # Fetch specific course and quizzes if provided
+        course = Course.objects.get(pk=course_pk)
+        quizzes = Quiz.objects.filter(course=course)
+        results = Grade.objects.filter(quiz__course=course, user=request.user).values('quiz__name', 'score', 'quiz__course_id')
+    else:
+        # Fetch all courses for the current user through Enrollment
+        user_courses = Course.objects.filter(enrollment__user=request.user)
+
+        # Fetch all quizzes related to those courses
+        quizzes = Quiz.objects.filter(course__in=user_courses)
+
+        # Fetch grades for quizzes related to these courses
+        results = Grade.objects.filter(quiz__course__in=user_courses, user=request.user).values('quiz__name', 'score', 'quiz__course_id')
+
+    # Prepare context for rendering
+    context = {
+        'quizzes': quizzes,
+        'results': results,
+        'user_courses': user_courses,  # Passing user courses for potential use in the template
+    }
+
+    return render(request, 'all_activities.html', context)
+
 
 
 def activities_view(request, pk):

@@ -26,5 +26,6 @@ urlpatterns = [
     path('custom-admin/dashboard/enroll/',enroll_user_admin, name='enroll_user_admin'),
     path('register/', register, name='register'),
     path('edit-password/', edit_password, name='edit_password'),
+    path('activities/', all_activities_view, name='all_activities_view'),
     # Additional URL patterns for other views if needed
 ]

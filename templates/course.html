@@ -81,7 +81,7 @@
         <button type="button" class="custom-btn">Add Quiz</button>
     </a>
 {% endif %}
-
+{#start#}
 {% for quiz in quizzes %}
     <button class="btn btn-link modal-button"
         data-pk="{{ quiz.pk }}"
@@ -130,6 +130,7 @@
     </div>
 </div>
     {% endif %}
+{#    end#}
 <!-- Student View -->
 {% if user.is_student %}
 <h2>Quiz Scores</h2>

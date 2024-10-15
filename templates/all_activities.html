@@ -9,7 +9,7 @@
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>{{ obj.name }} Activities / Quizzes</title>
+        <title>All Activities / Quizzes</title>
 
         <style>
             .custom-btn {
@@ -39,11 +39,12 @@
     </head>
     <body>
 
-        <h1>{{ obj.name }} Activities / Quizzes</h1>
+        <h1>All Activities / Quizzes</h1>
         <hr>
 
         <!-- Loop through quizzes and create buttons with dividers -->
         {% for quiz in quizzes %}
+            <h4>Course: {{ quiz.course.name }}</h4> <!-- Display course name -->
             <button class="btn btn-link quiz-button modal-button"
                     data-pk="{{ quiz.pk }}"
                     data-quiz="{{ quiz.name }}"
@@ -57,10 +58,8 @@
             <hr> <!-- Divider between quizzes -->
         {% endfor %}
 
-        {% if user.is_professor %} <!-- Move the button below the quiz list -->
-            <a href="{% url 'quizzes:create_quiz' obj.pk %}">
-                <button type="button" class="custom-btn">Add Quiz</button>
-            </a>
+        {% if user.is_professor %}
+            <button type="button" class="custom-btn">Add Quiz</button>
         {% endif %}
 
         <!-- Modal for Starting Quiz -->
@@ -80,14 +79,14 @@
             </div>
         </div>
 
-        <!-- JavaScript to handle modal content population and starting the quiz -->
         <script>
             document.addEventListener('DOMContentLoaded', function() {
                 const modalButtons = document.querySelectorAll('.modal-button');
                 const modalBody = document.getElementById('modal-body-confirm');
                 const startButton = document.getElementById('start-button');
 
-                let currentQuizPK; // Variable to store current quiz primary key
+                let currentQuizPK;
+                let currentCoursePK;
 
                 modalButtons.forEach(button => {
                     button.addEventListener('click', function() {
@@ -96,10 +95,9 @@
                         const time = this.getAttribute('data-time');
                         const passScore = this.getAttribute('data-pass');
 
-                        // Store the current quiz primary key
                         currentQuizPK = this.getAttribute('data-pk');
+                        currentCoursePK = this.getAttribute('data-course');
 
-                        // Populate modal body with quiz details
                         modalBody.innerHTML = `
                             <p>Quiz Name: ${quizName}</p>
                             <p>Number of Questions: ${questions}</p>
@@ -109,17 +107,14 @@
                     });
                 });
 
-                // Start button functionality
                 startButton.addEventListener('click', function() {
                     if (currentQuizPK) {
-                        const coursePK = {{ obj.pk }};  // Assuming you have access to the course primary key in your context
-                        window.location.href = `/course/${coursePK}/${currentQuizPK}/`; // Redirect to the correct URL
+                        window.location.href = `/course/${currentQuizPK}/${currentQuizPK}/`;
                     }
                 });
             });
         </script>
 
-        <!-- Bootstrap JS -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
     </body>

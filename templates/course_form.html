@@ -1,27 +1,147 @@
-<!-- templates/course_form.html -->
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create a New Course</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            background-color: #f4f6f9;
+            color: #343a40;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 30px;
+            background-color: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+        h1 {
+            color: #e03e31;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        h2 {
+            margin-top: 40px;
+            font-size: 1.8em;
+            border-bottom: 2px solid #e03e31;
+            padding-bottom: 10px;
+        }
+        .form-container {
+            margin-bottom: 40px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            transition: border-color 0.3s;
+        }
+        input[type="text"]:focus,
+        textarea:focus {
+            border-color: #e03e31;
+            outline: none;
+        }
+        button {
+            background-color: #e03e31;
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s, transform 0.2s;
+            width: 100%;
+            font-size: 1.1em;
+        }
+        button:hover {
+            background-color: #c12d26;
+        }
+        .back-button {
+            display: block;
+            text-align: center;
+            background-color: #007bff;
+            color: white;
+            padding: 14px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            margin-top: 10px;
+            transition: background-color 0.3s;
+        }
+        .back-button:hover {
+            background-color: #0056b3;
+        }
+        ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        li {
+            background-color: #f8f9fa;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        li a {
+            color: #e03e31;
+            font-weight: bold;
+            text-decoration: none;
+            float: right;
+        }
+        li a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
-    <h1>Create a New Course</h1>
-    <form method="POST">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Save</button>
-    </form>
 
-    <h2>Available Courses</h2>
-    <ul>
-        {% for course in courses %}
-        <li>
-            {{ course.name }}
-            <a href="{% url 'class:course_delete_view' course.pk %}">Delete</a>
-        </li>
-        {% empty %}
-        <li>No courses available.</li>
-        {% endfor %}
-    </ul>
+    <div class="container">
+        <h1>Create a New Course</h1>
+
+        <div class="form-container">
+            <form method="POST">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="course-name">Course Name</label>
+                    {{ form.name }}
+                </div>
+                <div class="form-group">
+                    <label for="course-description">Description</label>
+                    {{ form.description }}
+                </div>
+                <button type="submit">Save Course</button>
+            </form>
+            <!-- Back to Homepage Button -->
+            <a href="{% url 'class:admin_custom_view' %}" class="back-button">Back to Homepage</a>
+        </div>
+
+        <h2>Available Courses</h2>
+        <ul>
+            {% for course in courses %}
+                <li>
+                    {{ course.name }}
+                    <a href="{% url 'class:course_delete_view' course.pk %}">Delete</a>
+                </li>
+            {% empty %}
+                <li>No courses available.</li>
+            {% endfor %}
+        </ul>
+    </div>
+
 </body>
 </html>

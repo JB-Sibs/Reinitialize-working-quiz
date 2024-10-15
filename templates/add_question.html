@@ -1,46 +1,151 @@
 <!DOCTYPE html>
 <html lang="en">
-<!-- templates/add_question.html -->
-<h1>Add Question {{ quiz.question_set.count }} of {{ quiz.no_of_questions }} for {{ quiz.name }}</h1>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
 
-    <!-- Input for Answer Choices -->
-    <div>
-        <label for="choice_0">Answer 1</label>
-        <input type="text" id="choice_0" name="choice_0" class="form-control" required>
-    </div>
-    <div>
-        <label for="choice_1">Answer 2</label>
-        <input type="text" id="choice_1" name="choice_1" class="form-control" required>
-    </div>
-    <div>
-        <label for="choice_2">Answer 3</label>
-        <input type="text" id="choice_2" name="choice_2" class="form-control" required>
-    </div>
-    <div>
-        <label for="choice_3">Answer 4</label>
-        <input type="text" id="choice_3" name="choice_3" class="form-control" required>
-    </div>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Question</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet"> <!-- Improved Font -->
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f0f0f0; /* Match background color with Create Quiz */
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
 
-    <!-- Radio Buttons for Correct Answer -->
-    <div>
-        <label>Correct Answer:</label>
-        <div>
-            <input type="radio" name="correct" value="choice_0"> Answer 1
-        </div>
-        <div>
-            <input type="radio" name="correct" value="choice_1"> Answer 2
-        </div>
-        <div>
-            <input type="radio" name="correct" value="choice_2"> Answer 3
-        </div>
-        <div>
-            <input type="radio" name="correct" value="choice_3"> Answer 4
-        </div>
-    </div>
+        .container {
+            max-width: 500px; /* Match width with Create Quiz */
+            padding: 30px;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
 
-    <button type="submit" class="btn btn-primary">Add Question</button>
-</form>
+        .container:hover {
+            box-shadow: 0 6px 30px rgba(0, 0, 0, 0.15); /* Hover effect for container */
+        }
+
+        .question-header {
+            text-align: center;
+            color: #800000; /* Match color with Create Quiz header */
+            font-size: 24px; /* Match font size with Create Quiz */
+            margin-bottom: 20px;
+            letter-spacing: 1px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            padding-left: 10px;
+            padding-right: 10px; /* Add padding inside the form */
+        }
+
+        label {
+            font-weight: 500;
+            color: #333;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            border-color: #800000; /* Match focus color with Create Quiz */
+            outline: none;
+        }
+
+        .radio-group {
+            margin-bottom: 20px;
+        }
+
+        .btn-submit {
+            background-color: #800000; /* Match color with Create Quiz */
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .btn-submit:hover {
+            background-color: #660000; /* Darker red on hover */
+            transform: translateY(-2px); /* Slight upward movement on hover */
+        }
+
+        .btn-submit:active {
+            transform: translateY(0); /* Restore on click */
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem; /* Space between form groups */
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1 class="question-header">Add Question {{ quiz.question_set.count }} of {{ quiz.no_of_questions }} for {{ quiz.name }}</h1>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }} <!-- Renders the form fields -->
+
+            <!-- Input for Answer Choices -->
+            <div class="form-group">
+                <label for="choice_0">Answer 1</label>
+                <input type="text" id="choice_0" name="choice_0" required placeholder="Enter answer choice...">
+            </div>
+            <div class="form-group">
+                <label for="choice_1">Answer 2</label>
+                <input type="text" id="choice_1" name="choice_1" required placeholder="Enter answer choice...">
+            </div>
+            <div class="form-group">
+                <label for="choice_2">Answer 3</label>
+                <input type="text" id="choice_2" name="choice_2" required placeholder="Enter answer choice...">
+            </div>
+            <div class="form-group">
+                <label for="choice_3">Answer 4</label>
+                <input type="text" id="choice_3" name="choice_3" required placeholder="Enter answer choice...">
+            </div>
+
+            <!-- Radio Buttons for Correct Answer -->
+            <div class="radio-group">
+                <label>Correct Answer:</label><br>
+                <div>
+                    <input type="radio" id="correct_choice_0" name="correct" value="choice_0" required>
+                    <label for="correct_choice_0">Answer 1</label>
+                </div>
+                <div>
+                    <input type="radio" id="correct_choice_1" name="correct" value="choice_1" required>
+                    <label for="correct_choice_1">Answer 2</label>
+                </div>
+                <div>
+                    <input type="radio" id="correct_choice_2" name="correct" value="choice_2" required>
+                    <label for="correct_choice_2">Answer 3</label>
+                </div>
+                <div>
+                    <input type="radio" id="correct_choice_3" name="correct" value="choice_3" required>
+                    <label for="correct_choice_3">Answer 4</label>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-submit">Add Question</button>
+        </form>
+    </div>
+</body>
+
 </html>
