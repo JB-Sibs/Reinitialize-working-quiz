@@ -10,6 +10,7 @@
         <tr>
             <th>Quiz Name</th>
             <th>Score</th>
+            <th>Period</th> <!-- Add a column for the period -->
         </tr>
     </thead>
     <tbody>
@@ -17,10 +18,11 @@
         <tr>
             <td>{{ result.quiz__name }}</td>
             <td>{{ result.score }}</td>
+            <td>{{ result.period|capfirst }}</td> <!-- Show the period -->
         </tr>
         {% empty %}
         <tr>
-            <td colspan="2">No quiz results available.</td>
+            <td colspan="3">No quiz results available.</td>
         </tr>
         {% endfor %}
     </tbody>
@@ -54,7 +56,7 @@
 {% endif %}
 
 <!-- Professor View -->
- {% if user.is_professor %}
+ {% if user.is_professor or user.is_admin %}
             <h2>Quiz Scores (All Students)</h2>
             <table border="1">
                 <thead>
@@ -68,7 +70,7 @@
                 <tbody>
                     {% for result in results_prof %}
                         <tr>
-                            <td>{{ result.user.get_full_name }}</td>
+                            <td>{{ result.user__username }}</td>
                             <td>{{ result.quiz__name }}</td>
                             <td>{{ result.score }}</td>
                             <td>{{ result.passed|yesno:"Yes,No" }}</td>
@@ -113,6 +115,29 @@
 <a href="{% url 'class:add_exam_result' obj.pk %}">
     <button type="button" class="custom-btn">Add exam results</button>
 </a>
-    
+
+{% endif %}
+    </div>
+    {% if user.is_student %}
+   <h2>Prelim Grades</h2>
+<p>Final Grade: {{ prelim_final }}</p>
+<p>Transmuted Grade: {{ prelim_transmuted }}</p>
+<p>Classification: {{ prelim_classification }}</p>
+
+<h2>Midterm Grades</h2>
+<p>Final Grade: {{ midterm_final }}</p>
+<p>Transmuted Grade: {{ midterm_transmuted }}</p>
+<p>Classification: {{ midterm_classification }}</p>
+
+<h2>Final Grades</h2>
+<p>Final Grade: {{ final_final }}</p>
+<p>Transmuted Grade: {{ final_transmuted }}</p>
+<p>Classification: {{ final_classification }}</p>
+
+    {% endif %}
+{% if user.is_professor or user.is_admin %}
+    <a href="{% url 'class:enroll_student' obj.pk %}">
+        <button type="button" class="custom-btn">Enroll Student</button>
+    </a>
 {% endif %}
 {% endblock %}

@@ -236,19 +236,43 @@ def all_materials_view(request):
 
 def grades_view(request, pk):
     obj = Course.objects.get(pk=pk)
+    # Fetch exam results for the current user and course
     exam_results = ExamResult.objects.filter(course=obj, student=request.user)
     exam_results_prof = ExamResult.objects.filter(course=obj)
 
     # Filter grades for quizzes related to this course, and get the quiz name and score
-    results = Grade.objects.filter(quiz__course=obj, user=request.user).values('quiz__name', 'score')
-    results_prof = Grade.objects.filter(quiz__course=obj).values('quiz__name', 'score')
-    # Pass context to the template
+    results = Grade.objects.filter(quiz__course=obj, user=request.user).values('quiz__name', 'score', 'period')
+    results_prof = Grade.objects.filter(quiz__course=obj).values('user__username', 'quiz__name', 'score', 'passed',
+                                                                 'period')
+
+    # Get grades filtered by period for the logged-in user
+    prelim_final, prelim_transmuted, prelim_classification = get_prelim_grades(user=request.user)
+    midterm_final, midterm_transmuted, midterm_classification = get_midterm_grades(user=request.user)
+    final_final, final_transmuted, final_classification = get_final_grades(user=request.user)
+
+
+    # Pass context to the template, including the grades
     context = {
         'obj': obj,
         'results': results,  # Passing both the quiz name and score
-        'exam_results': exam_results,  # Passing the exam results to the template'
-        'exam_results_prof': exam_results_prof,  # Passing the exam results to the template'
+        'exam_results': exam_results,  # Passing the exam results to the template
+        'exam_results_prof': exam_results_prof,  # Passing the exam results to the template
         'results_prof': results_prof,
+
+        # Prelim grade information
+        'prelim_final': prelim_final,
+        'prelim_transmuted': prelim_transmuted,
+        'prelim_classification': prelim_classification,
+
+        # Midterm grade information
+        'midterm_final': midterm_final,
+        'midterm_transmuted': midterm_transmuted,
+        'midterm_classification': midterm_classification,
+
+        # Final grade information
+        'final_final': final_final,
+        'final_transmuted': final_transmuted,
+        'final_classification': final_classification,
     }
     return render(request, 'grades_view.html', context)
 
