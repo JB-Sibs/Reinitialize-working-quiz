@@ -1,0 +1,145 @@
+/* General container for quizzes */
+.quiz-section {
+    margin: 20px;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-left: 150px; /* Move the box 150px to the right */
+}
+
+/* Header style */
+.quiz-section h1 {
+    text-align: center;
+    font-size: 28px;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+/* Add quiz button style */
+.quiz-section .custom-btn {
+    background-color: #28a745;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.quiz-section .custom-btn:hover {
+    background-color: #218838;
+}
+
+/* Quiz buttons for students */
+.quiz-section .modal-button {
+    background-color: #007bff !important;
+    color: white !important;
+    padding: 8px 12px !important;
+    font-size: 14px !important;
+    border-radius: 5px !important;
+    transition: all 0.3s ease !important;
+}
+
+.quiz-section .modal-button:hover {
+    background-color: #0056b3 !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
+}
+
+
+
+/* Table styling */
+.quiz-section table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.quiz-section th, .quiz-section td {
+    padding: 12px;
+    text-align: left;
+    border: 1px solid #ddd;
+}
+
+.quiz-section th {
+    background-color: #f2f2f2;
+    color: #333;
+}
+
+.quiz-section td {
+    background-color: #fff;
+}
+
+/* Modal headers and footers */
+.quiz-section .modal-header {
+    background-color: #f8f9fa;
+}
+
+.quiz-section .modal-title {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.quiz-section .modal-footer {
+    background-color: #f8f9fa;
+}
+
+/* Close and action buttons for modals */
+.quiz-section .btn-close {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+.quiz-section .btn-success {
+    background-color: #28a745;
+    color: white;
+}
+
+.quiz-section .btn-success:hover {
+    background-color: #218838;
+}
+
+.quiz-section .btn-danger {
+    background-color: #dc3545;
+    color: white;
+}
+
+.quiz-section .btn-danger:hover {
+    background-color: #c82333;
+}
+
+.quiz-section .btn-primary {
+    background-color: #007bff;
+    color: white;
+}
+
+.quiz-section .btn-primary:hover {
+    background-color: #0056b3;
+}
+
+/* Adjustments for professor and student views */
+.quiz-section .professor-view, .quiz-section .student-view {
+    margin-top: 30px;
+}
+
+.quiz-section h2 {
+    margin-top: 30px;
+    font-size: 22px;
+}
+
+/* Additional button styles */
+.quiz-section .enroll-btn {
+    background-color: #17a2b8;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.quiz-section .enroll-btn:hover {
+    background-color: #138496;
+}

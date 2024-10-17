@@ -4,6 +4,9 @@
 {% block scripts %}
     <script src="{% static 'quizzes/main.js' %}?v=1" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="{% static 'profile.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'quiz.css' %}">
+
     <script>
         const toggleButton = document.querySelector('.toggle-dashboard');
         const dashboard = document.querySelector('.dashboard');
@@ -19,27 +22,31 @@
     <!-- Main Content -->
     <div class="content-container">
         <h1>{{ obj.name }} Announcements</h1>
+        <div class="main-content">
+      <div class="timeline"> <!-- Announcement timeline style -->
+        <ul class="timeline">
+    {% for announcement in announcements %}
+    <li>
+        <div class="timeline-time">
+            <span class="date">{{ announcement.posted_on|date:"F d, Y" }}</span>
+        </div>
+        <div class="timeline-icon">
+            <a href="#"></a>
+        </div>
+        <div class="timeline-body">
+            <div class="timeline-header">
+                <h3 class="timeline-title">{{ announcement.title }}</h3>
+            </div>
+            <div class="timeline-content">
+                <p>{{ announcement.content }}</p>
+            </div>
+        </div>
+    </li>
+    {% endfor %}
+</ul>
 
-        {% if user.is_professor or user.is_admin %}
-            <a href="{% url 'class:add_announcement' obj.pk %}">
-                <button type="button" class="custom-btn">Add Announcement</button>
-            </a>
-        {% endif %}
-
-        <ul class="announcement-list">
-            {% for announcement in announcements %}
-                <li>
-                    <div class="announcement-container">
-                        <h3>{{ announcement.title }}</h3>
-                        <div class="announcement-item">
-                            <p>{{ announcement.content }}</p>
-                        </div>
-                    <p><small>Posted on: {{ announcement.posted_on|date:"F d, Y" }}</small></p>
-                    </div>
-                </li>
-            {% endfor %}
-        </ul>
-
+      </div>
+    </div>
         <h1>{{ obj.name }} Materials</h1>
 
         {% if user.is_professor or user.is_admin %}
@@ -48,226 +55,315 @@
             </a>
         {% endif %}
 
-<div class="module-section">
-            <div class="module-content">
-                <ul class="materials-list">
-                    {% for material in materials %}
-                        <li class="module-item">
-                            <i class="module-icon">📄</i>
-                            <h3>{{ material.title }}</h3>
-                            {% if material.type in "png jpg jpeg" %}
-                                <!-- Image Preview -->
-                                <img src="{{ material.url }}" alt="{{ material.title }}" style="max-width: 100%; height: auto;" />
-                            {% elif material.type in "pdf doc docx" %}
-                                <p><a href="{{ material.url }}" download>Download File</a></p>
-                            {% else %}
-                                <!-- Fallback for other file types -->
-                                <p><a href="{{ material.url }}" target="_blank">Download File</a></p>
-                            {% endif %}
+<div class="module-section" style="margin-left: 150px; border: 1px solid #ccc; padding: 20px; box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1); border-radius: 8px;">
+    <div class="module-content">
+        <ul class="materials-list">
+            {% for material in materials %}
+                <li class="module-item">
+                    <h3>{{ material.title }}</h3>
+                    {% if material.type in "png jpg jpeg" %}
+                        <!-- Image Preview -->
+                        <img src="{{ material.url }}" alt="{{ material.title }}" style="max-width: 100%; height: auto;" />
+                    {% elif material.type in "pdf doc docx" %}
+                        <p><a href="{{ material.url }}" download>Download File</a></p>
+                    {% else %}
+                        <!-- Fallback for other file types -->
+                        <p><a href="{{ material.url }}" target="_blank">Download File</a></p>
+                    {% endif %}
 
-                        <p><small>Posted on: {{ material.posted_on|date:"F d, Y" }}</small></p>
-                    {% endfor %}
-                </ul>
-            </div>
-        </div>
+                    <p><small>Posted on: {{ material.posted_on|date:"F d, Y" }}</small></p>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
 
-        <!-- Quizzes Section -->
-      <!-- Quizzes Section -->
-<h1>{{ obj.name }} Quizzes</h1>
-<hr>
 
-{% if user.is_professor or user.is_admin %}
+ <!-- Quizzes Section -->
+<div class="quiz-section"> <!-- Add the general container for quizzes -->
+    <h1>{{ obj.name }} Quizzes</h1>
+    <hr>
+
+    {% if user.is_professor or user.is_admin %}
     <a href="{% url 'quizzes:create_quiz' obj.pk %}">
-        <button type="button" class="custom-btn">Add Quiz</button>
+        <button type="button" class="custom-btn">Add Quiz</button> <!-- Custom button class -->
     </a>
-{% endif %}
-{#start#}
-{% for quiz in quizzes %}
-    <button class="btn btn-link modal-button"
-        data-pk="{{ quiz.pk }}"
-        data-quiz="{{ quiz.name }}"
-        data-questions="{{ quiz.no_of_questions }}"
-        data-time="{{ quiz.time_limit }}"
-        data-pass="{{ quiz.req_score_to_pass }}"
-        attempts_left="{{ quiz.attempts_allowed }}"
-        data-bs-toggle="modal"
-        data-bs-target="#quizStartModal">
-        {{ quiz.name }}
-    </button>
-{% endfor %}
-{% if user.is_student %}
-<!-- Modal for Starting Quiz -->
-<div class="modal fade" id="quizStartModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h1 class="modal-title fs-5" id="exampleModalLabel">Start Quiz</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body" id="modal-body-confirm"></div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
-                <button type="button" id="start-button" class="btn btn-success">Start</button>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- Modal for showing no attempts left -->
-<div class="modal fade" id="noAttemptsModal" tabindex="-1" aria-labelledby="noAttemptsModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="noAttemptsModalLabel">No Attempts Left</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p>You have no attempts left for this quiz. Please contact your instructor for further assistance.</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary" id="returnToCourseBtn">Return to Course</button>
-            </div>
-        </div>
-    </div>
-</div>
     {% endif %}
-{#    end#}
-<!-- Student View -->
-{% if user.is_student %}
-<h2>Quiz Scores</h2>
-<table border="1">
-    <thead>
-        <tr>
-            <th>Quiz Name</th>
-            <th>Score</th>
-            <th>Period</th> <!-- Add a column for the period -->
-        </tr>
-    </thead>
-    <tbody>
-        {% for result in results %}
-        <tr>
-            <td>{{ result.quiz__name }}</td>
-            <td>{{ result.score }}</td>
-            <td>{{ result.period|capfirst }}</td> <!-- Show the period -->
-        </tr>
-        {% empty %}
-        <tr>
-            <td colspan="3">No quiz results available.</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-
-<h2>Exam Scores</h2>
-<table border="1">
-    <thead>
-        <tr>
-            <th>Exam Name</th>
-            <th>Score</th>
-            <th>Total Items</th>
-            <th>Date Taken</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for exam in exam_results %}
-        <tr>
-            <td>{{ exam.exam_name }}</td>
-            <td>{{ exam.score }}</td>
-            <td>{{ exam.total_items }}</td>
-            <td>{{ exam.date_taken }}</td>
-        </tr>
-        {% empty %}
-        <tr>
-            <td colspan="4">No exam results available.</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-{% endif %}
-
-<!-- Professor View -->
- {% if user.is_professor or user.is_admin %}
-            <h2>Quiz Scores (All Students)</h2>
-            <table border="1">
-                <thead>
-                    <tr>
-                        <th>Student Name</th>
-                        <th>Quiz Name</th>
-                        <th>Score</th>
-                        <th>Passed</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for result in results_prof %}
-                        <tr>
-                            <td>{{ result.user__username }}</td>
-                            <td>{{ result.quiz__name }}</td>
-                            <td>{{ result.score }}</td>
-                            <td>{{ result.passed|yesno:"Yes,No" }}</td>
-                        </tr>
-                    {% empty %}
-                        <tr>
-                            <td colspan="4">No quiz results available.</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-
-<h2>Exam Scores (All Students)</h2>
-<table border="1">
-    <thead>
-        <tr>
-            <th>Student Name</th>
-            <th>Exam Name</th>
-            <th>Score</th>
-            <th>Total Items</th>
-            <th>Date Taken</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for exam in exam_results_prof %}
-        <tr>
-            <td>{{ exam.student }}</td> <!-- Display student name -->
-            <td>{{ exam.exam_name }}</td>
-            <td>{{ exam.score }}</td>
-            <td>{{ exam.total_items }}</td>
-            <td>{{ exam.date_taken }}</td>
-        </tr>
-        {% empty %}
-        <tr>
-            <td colspan="5">No exam results available.</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-
-<!-- Add exam results button for professors -->
-<a href="{% url 'class:add_exam_result' obj.pk %}">
-    <button type="button" class="custom-btn">Add exam results</button>
-</a>
-
-{% endif %}
-    </div>
+    
+    {% for quiz in quizzes %}
+    <button class="btn btn-link modal-button" 
+    data-pk="{{ quiz.pk }}" 
+    data-quiz="{{ quiz.name }}" 
+    data-questions="{{ quiz.no_of_questions }}" 
+    data-time="{{ quiz.time_limit }}" 
+    data-pass="{{ quiz.req_score_to_pass }}" 
+    attempts_left="{{ quiz.attempts_allowed }}" 
+    data-bs-toggle="modal" 
+    data-bs-target="#quizStartModal"
+    style="background-color: #007bff; color: white; border: none; padding: 8px 12px; font-size: 14px; border-radius: 5px;"> 
+    {{ quiz.name }}
+</button>
+    {% endfor %}
+    
     {% if user.is_student %}
-   <h2>Prelim Grades</h2>
-<p>Final Grade: {{ prelim_final }}</p>
-<p>Transmuted Grade: {{ prelim_transmuted }}</p>
-<p>Classification: {{ prelim_classification }}</p>
-
-<h2>Midterm Grades</h2>
-<p>Final Grade: {{ midterm_final }}</p>
-<p>Transmuted Grade: {{ midterm_transmuted }}</p>
-<p>Classification: {{ midterm_classification }}</p>
-
-<h2>Final Grades</h2>
-<p>Final Grade: {{ final_final }}</p>
-<p>Transmuted Grade: {{ final_transmuted }}</p>
-<p>Classification: {{ final_classification }}</p>
-
+    <!-- Modal for Starting Quiz -->
+    <div class="modal fade" id="quizStartModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Start Quiz</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="modal-body-confirm"></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button> <!-- Danger button class -->
+                    <button type="button" id="start-button" class="btn btn-success">Start</button> <!-- Success button class -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal for showing no attempts left -->
+    <div class="modal fade" id="noAttemptsModal" tabindex="-1" aria-labelledby="noAttemptsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="noAttemptsModalLabel">No Attempts Left</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>You have no attempts left for this quiz. Please contact your instructor for further assistance.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="returnToCourseBtn">Return to Course</button> <!-- Primary button class -->
+                </div>
+            </div>
+        </div>
+    </div>
     {% endif %}
-{% if user.is_professor or user.is_admin %}
-    <a href="{% url 'class:enroll_student' obj.pk %}">
-        <button type="button" class="custom-btn">Enroll Student</button>
+    
+    <!-- Student View -->
+    {% if user.is_student %}
+    <h2>Quiz Scores</h2>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Quiz Name</th>
+                <th>Score</th>
+                <th>Period</th> <!-- Add a column for the period -->
+            </tr>
+        </thead>
+        <tbody>
+            {% for result in results %}
+            <tr>
+                <td>{{ result.quiz__name }}</td>
+                <td>{{ result.score }}</td>
+                <td>{{ result.period|capfirst }}</td> <!-- Show the period -->
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="3">No quiz results available.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h2>Exam Scores</h2>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Exam Name</th>
+                <th>Score</th>
+                <th>Total Items</th>
+                <th>Date Taken</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for exam in exam_results %}
+            <tr>
+                <td>{{ exam.exam_name }}</td>
+                <td>{{ exam.score }}</td>
+                <td>{{ exam.total_items }}</td>
+                <td>{{ exam.date_taken }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4">No exam results available.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+    
+    <!-- Professor View -->
+    {% if user.is_professor or user.is_admin %}
+    <h2>Quiz Scores (All Students)</h2>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Student Name</th>
+                <th>Quiz Name</th>
+                <th>Score</th>
+                <th>Passed</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for result in results_prof %}
+            <tr>
+                <td>{{ result.user__username }}</td>
+                <td>{{ result.quiz__name }}</td>
+                <td>{{ result.score }}</td>
+                <td>{{ result.passed|yesno:"Yes,No" }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4">No quiz results available.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h2>Exam Scores (All Students)</h2>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Student Name</th>
+                <th>Exam Name</th>
+                <th>Score</th>
+                <th>Total Items</th>
+                <th>Date Taken</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for exam in exam_results_prof %}
+            <tr>
+                <td>{{ exam.student }}</td> <!-- Display student name -->
+                <td>{{ exam.exam_name }}</td>
+                <td>{{ exam.score }}</td>
+                <td>{{ exam.total_items }}</td>
+                <td>{{ exam.date_taken }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5">No exam results available.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Add exam results button for professors -->
+    <a href="{% url 'class:add_exam_result' obj.pk %}">
+        <button type="button" class="custom-btn">Add exam results</button>
     </a>
+    {% endif %}
+    
+     {% if user.is_student %}
+        <!-- Prelim, Midterm, Final Grades -->
+        {% if prelim_final or prelim_transmuted or prelim_classification %}
+        <div class="grades-card">
+            <h3>Prelim Grades</h3>
+            {% if prelim_final %}<p><strong>Final Grade:</strong> {{ prelim_final|floatformat:"2" }}</p>{% endif %}
+            {% if prelim_transmuted %}<p><strong>Transmuted Grade:</strong> {{ prelim_transmuted|floatformat:"2" }}</p>{% endif %}
+            {% if prelim_classification %}<p><strong>Classification:</strong> {{ prelim_classification }}</p>{% endif %}
+        </div>
+        {% endif %}
+
+        {% if midterm_final or midterm_transmuted or midterm_classification %}
+        <div class="grades-card">
+            <h3>Midterm Grades</h3>
+            {% if midterm_final %}<p><strong>Final Grade:</strong> {{ midterm_final|floatformat:"2" }}</p>{% endif %}
+            {% if midterm_transmuted %}<p><strong>Transmuted Grade:</strong> {{ midterm_transmuted|floatformat:"2" }}</p>{% endif %}
+            {% if midterm_classification %}<p><strong>Classification:</strong> {{ midterm_classification }}</p>{% endif %}
+        </div>
+        {% endif %}
+
+        {% if final_final or final_transmuted or final_classification %}
+        <div class="grades-card">
+            <h3>Final Grades</h3>
+            {% if final_final %}<p><strong>Final Grade:</strong> {{ final_final|floatformat:"2" }}</p>{% endif %}
+            {% if final_transmuted %}<p><strong>Transmuted Grade:</strong> {{ final_transmuted|floatformat:"2" }}</p>{% endif %}
+            {% if final_classification %}<p><strong>Classification:</strong> {{ final_classification }}</p>{% endif %}
+        </div>
+            
+            <div class="grades-card">
+            <h2>Final Computation of Grades: {{ final_grade_average|floatformat:"2" }}</h2>
+<h2>Transmuted Grade: 
+    {% if final_grade_average >= 95.2000 %}
+        1.00 (Outstanding)
+    {% elif final_grade_average >= 90.4000 and final_grade_average < 95.2000 %}
+        1.25 (Excellent)
+    {% elif final_grade_average >= 85.6000 and final_grade_average < 90.4000 %}
+        1.50 (Superior)
+    {% elif final_grade_average >= 80.8000 and final_grade_average < 85.6000 %}
+        1.75 (Very Good)
+    {% elif final_grade_average >= 76.0000 and final_grade_average < 80.8000 %}
+        2.00 (Good)
+    {% elif final_grade_average >= 71.2000 and final_grade_average < 76.0000 %}
+        2.25 (Satisfactory)
+    {% elif final_grade_average >= 66.4000 and final_grade_average < 71.2000 %}
+        2.50 (Fairly Satisfactory)
+    {% elif final_grade_average >= 61.6000 and final_grade_average < 66.4000 %}
+        2.75 (Fair)
+    {% elif final_grade_average >= 60.0000 and final_grade_average < 61.6000 %}
+        3.00 (Passed)
+    {% else %}
+        5.00 (Failed)
+    {% endif %}
+</h2>
+
+
+        </div>
+        {% endif %}
+        {% endif %}
+    {% if user.is_professor %}
+<div class="grades-card">
+    <h3>Student Grades Overview</h3>
+    {% for student, grades in student_grades.items %}
+
+        {% comment %} Check if the current user is a professor and skip grades display {% endcomment %}
+        {% if not student == user.username %} 
+                    <h4>{{ student }}</h4>
+<!-- Check if the student is not the current user -->
+            {% if grades.prelim_final or grades.prelim_transmuted or grades.prelim_classification %}
+            <div>
+                <h5>Prelim Grades</h5>
+                {% if grades.prelim_final %}<p><strong>Final Grade:</strong> {{ grades.prelim_final|floatformat:"2" }}</p>{% endif %}
+                {% if grades.prelim_transmuted %}<p><strong>Transmuted Grade:</strong> {{ grades.prelim_transmuted|floatformat:"2" }}</p>{% endif %}
+                {% if grades.prelim_classification %}<p><strong>Classification:</strong> {{ grades.prelim_classification }}</p>{% endif %}
+            </div>
+            {% endif %}
+
+            {% if grades.midterm_final or grades.midterm_transmuted or grades.midterm_classification %}
+            <div>
+                <h5>Midterm Grades</h5>
+                {% if grades.midterm_final %}<p><strong>Final Grade:</strong> {{ grades.midterm_final|floatformat:"2" }}</p>{% endif %}
+                {% if grades.midterm_transmuted %}<p><strong>Transmuted Grade:</strong> {{ grades.midterm_transmuted|floatformat:"2" }}</p>{% endif %}
+                {% if grades.midterm_classification %}<p><strong>Classification:</strong> {{ grades.midterm_classification }}</p>{% endif %}
+            </div>
+            {% endif %}
+
+            {% if grades.final_final or grades.final_transmuted or grades.final_classification %}
+            <div>
+                <h5>Final Grades</h5>
+                {% if grades.final_final %}<p><strong>Final Grade:</strong> {{ grades.final_final|floatformat:"2" }}</p>{% endif %}
+                {% if grades.final_transmuted %}<p><strong>Transmuted Grade:</strong> {{ grades.final_transmuted|floatformat:"2" }}</p>{% endif %}
+                {% if grades.final_classification %}<p><strong>Classification:</strong>{{ grades.final_classification }}</p>{% endif %}
+            
+            </div>
+                
+            {% endif %}
+        {% else %}
+        {% endif %}
+        
+    {% endfor %}
+</div>
 {% endif %}
+    
+    {% if user.is_professor or user.is_admin %}
+    <a href="{% url 'class:enroll_student' obj.pk %}">
+        <button type="button" class="custom-btn enroll-btn">Enroll Student</button> <!-- Enroll button -->
+    </a>
+    {% endif %}
+</div>
 
 {% endblock %}

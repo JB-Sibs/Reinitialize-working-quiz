@@ -6,6 +6,7 @@ from .models import *
 from django.contrib import messages
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
+from .models import Announcement
 
 from .forms import Announcementform, Materialsform, ExamResultForm, EnrollmentForm, CourseForm, EnrollmentFormAdmin, \
     CustomUserCreationForm, AdminPasswordChangeForm
@@ -36,8 +37,6 @@ def calculate_exam_grade(exams):
 
     # Formula: [(score1 + score2) / (total1 + total2)] * 40
     return (total_score / total_items) * 40
-
-
 
 
 def admin_custom_view(request):
@@ -79,13 +78,15 @@ def course_view(request, pk):
 
     # Filter grades for quizzes related to this course, and get the quiz name and score
     results = Grade.objects.filter(quiz__course=obj, user=request.user).values('quiz__name', 'score', 'period')
-    results_prof = Grade.objects.filter(quiz__course=obj).values('user__username', 'quiz__name', 'score', 'passed',
-                                                                 'period')
+    results_prof = Grade.objects.filter(quiz__course=obj).values('user__username', 'quiz__name', 'score', 'passed','period')
 
     # Get grades filtered by period for the logged-in user
     prelim_final, prelim_transmuted, prelim_classification = get_prelim_grades(user=request.user, course=obj)
     midterm_final, midterm_transmuted, midterm_classification = get_midterm_grades(user=request.user, course=obj)
     final_final, final_transmuted, final_classification = get_final_grades(user=request.user, course=obj)
+
+    total_final_grades = prelim_final + midterm_final + final_final
+    final_grade_average = total_final_grades / 3
 
     # Create a list of materials with their types
     material_info = []
@@ -123,6 +124,9 @@ def course_view(request, pk):
         'final_final': final_final,
         'final_transmuted': final_transmuted,
         'final_classification': final_classification,
+
+        'final_grade_average': final_grade_average,
+
     }
 
     return render(request, 'course.html', context)
@@ -162,6 +166,7 @@ def all_materials_view(request):
             'url': material.content.url,
             'type': file_extension,
             'posted_on': material.created_on,
+            'course': material.course
         })
 
     # Pass context to the template
@@ -513,6 +518,11 @@ def edit_password(request):
         form = AdminPasswordChangeForm()
 
     return render(request, 'password_edit.html', {'form': form})
+
+def announcements_view(request, class_id):
+    # Order announcements by 'posted_on' in descending order (newest first)
+    announcements = Announcement.objects.filter(class_id=class_id).order_by('-posted_on')
+    return render(request, 'announcement_view.html', {'announcements': announcements})
 
 
 def get_grades_by_period(user, period, course):

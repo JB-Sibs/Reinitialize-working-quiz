@@ -1,25 +1,28 @@
-{% extends 'taskbar.html' %}
-{% load static %}
-
-{% block content %}
-    <div class="content-container">
-        <h1>All Announcements</h1>
-
-        <ul class="announcement-list">
-            {% for announcement in announcements %}
-                <li>
-                    <div class="announcement-container">
-                        <h3>{{ announcement.title }}</h3>
-                        <p><strong>Course:</strong> {{ announcement.course.name }}</p> <!-- Display course name -->
-                        <div class="announcement-item">
+    {% extends 'taskbar.html' %}
+    {% load static %}
+    
+    {% block content %}
+        <div class="container mt-4">
+            <h1 class="mb-4 text-center"><b>All Announcements</b></h1> <!-- Added text-center class -->
+    
+            <!-- Announcement List -->
+            <div class="announcement-container bg-light border rounded p-4">
+                <ul class="list-group">
+                    {% for announcement in announcements %}
+                        <li class="list-group-item mb-3 rounded"> <!-- Added rounded class here -->
+                            <h5 class="announcement-title fw-bold fs-4">{{ announcement.title }}</h5> <!-- Enhanced title styling without blue color -->
+                            <hr class="my-2"> <!-- Line below title -->
+                            <p class="course-name"><strong>Course:</strong> {{ announcement.course.name }}</p>
                             <p>{{ announcement.content }}</p>
-                            <p><small>Posted on: {{ announcement.posted_on|date:"F d, Y" }}</small></p>
-                        </div>
-                    </div>
-                </li>
-            {% empty %}
-                <li>No announcements available.</li>
-            {% endfor %}
-        </ul>
-    </div>
-{% endblock %}
+                            <hr class="my-2"> <!-- Line above posted date -->
+                            <small class="text-muted float-end">
+                                Posted on: {{ announcement.posted_on|date:"F d, Y" }}
+                            </small>
+                        </li>
+                    {% empty %}
+                        <li class="list-group-item text-center">No announcements available.</li> 
+                    {% endfor %}
+                </ul> 
+            </div>
+        </div>
+    {% endblock %}

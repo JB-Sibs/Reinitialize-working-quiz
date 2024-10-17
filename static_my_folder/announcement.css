@@ -1,0 +1,71 @@
+/* announcement.css */
+
+/* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f9f9f9;
+    margin: 0;
+    padding: 20px;
+}
+
+/* Content Container */
+.content-container {
+    max-width: 1200px; /* Optional: Increase max-width for larger screens */
+    margin: 0 auto; /* Center the container */
+    padding: 20px;
+}
+
+/* Title Styles */
+.page-title {
+    font-size: 2em;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+/* Announcement List Styles */
+.announcement-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+/* Announcement Item Styles */
+.announcement-item {
+    width: 100%; /* Full width of the parent container */
+    margin-bottom: 15px;
+}
+
+.announcement-container {
+    padding: 15px;
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+    background-color: #ffffff; /* Ensure background is white */
+    transition: background-color 0.3s ease;
+}
+
+.announcement-container:hover {
+    background-color: #f1f1f1; /* Subtle hover effect */
+}
+
+/* Announcement Content Styles */
+.announcement-title {
+    font-size: 1.5em;
+    color: #007bff; /* Bootstrap primary color */
+}
+
+.course-name {
+    font-weight: bold;
+}
+
+.announcement-content {
+    margin-top: 10px;
+}
+
+.posted-date {
+    color: #888; /* Grey for date */
+}
+
+/* No Announcements Styles */
+.no-announcements {
+    text-align: center;
+    font-style: italic;
+}
