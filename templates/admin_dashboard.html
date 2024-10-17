@@ -110,6 +110,8 @@
       gap: 20px;
       justify-content: center;
       margin: 20px 0;
+      margin-left: 270px; /* Prevent courses from being hidden by the dashboard */
+      transition: margin-left 0.3s ease; /* Smooth transition when dashboard is toggled */
     }
 
     .course-card {
@@ -168,30 +170,19 @@
     }
 
     @media (max-width: 767.98px) {
-      .dashboard {
-        width: 100%;
-        height: 100vh;
+      .courses {
+        margin-left: 0; /* Reset margin on small screens */
       }
 
-      .dashboard-header h2 {
-        font-size: 1.2rem;
-      }
-    }
-
-    @media (max-width: 575.98px) {
-      .dashboard {
-        width: 100%;
-        height: 100vh;
-      }
-
-      .dashboard-header h2 {
-        font-size: 1rem;
+      .toggle-dashboard {
+        left: 10px; /* Ensure toggle button stays visible on small screens */
       }
     }
   </style>
 </head>
 <body>
-  <button class="toggle-dashboard">Hide Dashboard</button> <div class="dashboard">
+  <button class="toggle-dashboard">Hide Dashboard</button>
+  <div class="dashboard">
     <div class="dashboard-header">
       <h2>Dashboard</h2>
     </div>
@@ -213,32 +204,35 @@
     </div>
   </div>
 
- <div class="courses">
-  {% for course in courses %}
-    <div class="course-card">
-      <div class="card-header" style="background-image: url('background.jpg');">
-        <div class="progress-indicator">N/A</div>
-        <button class="info-btn">i</button>
+  <div class="courses">
+    {% for course in courses %}
+      <div class="course-card">
+        <div class="card-header" style="background-image: url('background.jpg');">
+          <div class="progress-indicator">N/A</div>
+          <button class="info-btn">i</button>
+        </div>
+        <div class="card-body">
+          <h3><a href="{% url 'class:course_view' course.id %}">{{ course.name }}</a></h3>
+          <p>Class Code: {{ course.code }}</p>
+        </div>
       </div>
-      <div class="card-body">
-        <h3><a href="{% url 'class:course_view' course.id %}">{{ course.name }}</a></h3> <!-- Assuming course has a 'name' field -->
-        <p>Class Code: {{ course.code }}</p> <!-- Assuming course has a 'code' field -->
-      </div>
-    </div>
-  {% endfor %}
-</div>
+    {% endfor %}
+  </div>
 
   <script>
     const toggleButton = document.querySelector('.toggle-dashboard');
     const dashboard = document.querySelector('.dashboard');
+    const coursesContainer = document.querySelector('.courses');
 
     toggleButton.addEventListener('click', () => {
       dashboard.classList.toggle('hide');
 
-      // Update the button text depending on the dashboard state
+      // Adjust courses margin when the dashboard is hidden
       if (dashboard.classList.contains('hide')) {
+        coursesContainer.style.marginLeft = '0';
         toggleButton.textContent = 'Show Dashboard';
       } else {
+        coursesContainer.style.marginLeft = '270px';
         toggleButton.textContent = 'Hide Dashboard';
       }
     });

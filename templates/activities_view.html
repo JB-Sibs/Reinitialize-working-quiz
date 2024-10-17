@@ -13,15 +13,17 @@
 
         <style>
             .custom-btn {
-                background-color: #890604; 
-                color: white; 
-                border: none; 
-                padding: 10px 20px; 
-                border-radius: 4px; 
-                cursor: pointer; 
-                font-size: 16px; 
+                background-color: #890604;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 16px;
                 transition: background-color .3s;
                 margin-top: .5rem;
+                display: block;
+                width: 100%; /* Ensure the button spans the full width */
             }
 
             .custom-btn:hover {
@@ -35,33 +37,80 @@
                 width: 100%;
                 text-align: left;
             }
+
+            /* Style for quiz cards */
+            .quiz-card {
+                background-color: #f9f9f9;
+                border-radius: 8px;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+                margin-bottom: 20px;
+                padding: 20px;
+                transition: box-shadow .3s;
+            }
+
+            .quiz-card:hover {
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            }
+
+            .quiz-title {
+                font-size: 18px;
+                font-weight: bold;
+                margin-bottom: 10px;
+            }
+
+            .quiz-info {
+                font-size: 14px;
+                color: #555;
+                margin-bottom: 5px;
+            }
+
+            hr {
+                border-top: 1px solid #ccc;
+                margin: 20px 0;
+            }
+
+            .modal-body p {
+                font-size: 16px;
+                margin-bottom: 10px;
+            }
         </style>
     </head>
     <body>
 
-        <h1>{{ obj.name }} Activities / Quizzes</h1>
-        <hr>
+        <div class="container mt-5">
+            <h1 class="mb-4 text-center">{{ obj.name }} Activities / Quizzes</h1>
+            <hr>
 
-        <!-- Loop through quizzes and create buttons with dividers -->
-        {% for quiz in quizzes %}
-            <button class="btn btn-link quiz-button modal-button"
-                    data-pk="{{ quiz.pk }}"
-                    data-quiz="{{ quiz.name }}"
-                    data-questions="{{ quiz.no_of_questions }}"
-                    data-time="{{ quiz.time_limit }}"
-                    data-pass="{{ quiz.req_score_to_pass }}"
-                    data-bs-toggle="modal"
-                    data-bs-target="#quizStartModal">
-                {{ quiz.name }}
-            </button>
-            <hr> <!-- Divider between quizzes -->
-        {% endfor %}
+            <!-- Loop through quizzes and create cards for each -->
+            {% for quiz in quizzes %}
+            <div class="quiz-card">
+                <div class="quiz-title">{{ quiz.name }}</div> <!-- Display quiz name -->
+                <div class="quiz-info">Course: {{ quiz.course.name }}</div> <!-- Display course name -->
+                <div class="quiz-info">Questions: {{ quiz.no_of_questions }}</div> <!-- Display number of questions -->
+                <div class="quiz-info">Time Allowed: {{ quiz.time_limit }} minutes</div> <!-- Display time limit -->
 
-        {% if user.is_professor %} <!-- Move the button below the quiz list -->
-            <a href="{% url 'quizzes:create_quiz' obj.pk %}">
-                <button type="button" class="custom-btn">Add Quiz</button>
-            </a>
-        {% endif %}
+                <button class="btn btn-link modal-button"
+                        data-pk="{{ quiz.pk }}"
+                        data-quiz="{{ quiz.name }}"
+                        data-questions="{{ quiz.no_of_questions }}"
+                        data-time="{{ quiz.time_limit }}"
+                        data-pass="{{ quiz.req_score_to_pass }}"
+                        data-bs-toggle="modal"
+                        data-bs-target="#quizStartModal">
+                    Start Quiz
+                </button>
+            </div>
+            {% endfor %}
+
+            {% if user.is_professor %}
+            <div class="add-quiz-btn">
+                <a href="{% url 'quizzes:create_quiz' obj.pk %}">
+                    <button type="button" class="custom-btn">Add Quiz</button>
+                </a>
+            </div>
+            {% endif %}
+
+        </div>
 
         <!-- Modal for Starting Quiz -->
         <div class="modal fade" id="quizStartModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -101,10 +150,10 @@
 
                         // Populate modal body with quiz details
                         modalBody.innerHTML = `
-                            <p>Quiz Name: ${quizName}</p>
-                            <p>Number of Questions: ${questions}</p>
-                            <p>Time Allowed: ${time} minutes</p>
-                            <p>Score Required to Pass: ${passScore}</p>
+                            <p><strong>Quiz Name:</strong> ${quizName}</p>
+                            <p><strong>Number of Questions:</strong> ${questions}</p>
+                            <p><strong>Time Allowed:</strong> ${time} minutes</p>
+                            <p><strong>Score Required to Pass:</strong> ${passScore}</p>
                         `;
                     });
                 });

@@ -1,36 +1,14 @@
 {% load static %}
 
-{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" >
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard</title>
 
   <style>
-    .announcement-container {
-    max-width: 1000px;
-    margin: 20px auto;
-    background-color: #f9f9f9;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 20px;
-    }
-
-    .announcement-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px;
-    border-bottom: 1px solid #eee;
-    }
-
-    .announcement-item:last-child {
-    border-bottom: none;
-    }
-
     body {
       font-family: Arial, sans-serif;
       background: #f0f0f0;
@@ -42,13 +20,13 @@
     }
 
     .dashboard {
-      width: 250px; /* Taskbar width */
+      width: 250px;
       height: 100vh;
       background-color: #333;
       color: #fff;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
       padding: 0;
-      position: fixed; /* Fixing the sidebar */
+      position: fixed;
       top: 0;
       left: 0;
       z-index: 1;
@@ -102,7 +80,7 @@
     }
 
     .dashboard-content a:hover {
-      color: #D5A84C;
+      color: #F00;
     }
 
     .navbar {
@@ -128,12 +106,75 @@
       cursor: pointer;
     }
 
-    /* Add margin to avoid overlap with taskbar */
     .main-content {
-      margin-left: 250px; /* Push content to the right */
-      padding: 20px; /* Add padding for spacing */
-      height: 100vh; /* Full height */
-      overflow-y: auto; /* Enable scrolling if content is too long */
+      margin-left: 250px;
+      padding: 20px;
+      height: 100vh;
+      overflow-y: auto;
+      transition: margin-left 0.3s ease;
+    }
+
+    .courses {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    .course-card {
+      width: 300px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-header {
+      background-size: cover;
+      background-position: center;
+      height: 120px;
+      position: relative;
+    }
+
+    .progress-indicator {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(255, 255, 255, 0.8);
+      padding: 5px 10px;
+      border-radius: 50px;
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    .card-body {
+      padding: 15px;
+      background-color: #fff;
+    }
+
+    .card-body h3 {
+      margin-top: 0;
+      font-size: 18px;
+      color: #333;
+    }
+
+    .card-body p {
+      color: #666;
+      font-size: 14px;
+    }
+
+    .info-btn {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: rgba(0, 0, 0, 0.5);
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 25px;
+      height: 25px;
+      font-size: 14px;
     }
 
     @media (max-width: 767.98px) {
@@ -146,42 +187,29 @@
         font-size: 1.2rem;
       }
 
-      /* On small screens, remove the left margin so content uses full width */
       .main-content {
         margin-left: 0;
       }
-    }
-
-    @media (max-width: 575.98px) {
-      .dashboard {
-        width: 100%;
-        height: 100vh;
-      }
-
-      .dashboard-header h2 {
-        font-size: 1rem;
-      }
-
-      .main-content {
-        margin-left: 0;
-      }
-
     }
   </style>
 </head>
 <body>
 
-  <!-- Dashboard is initially visible -->
-  <button class="toggle-dashboard">Hide Dashboard</button> <!-- Button now says "Hide" by default -->
+  <!-- Dashboard toggle button -->
+  <button class="toggle-dashboard">Hide Dashboard</button>
+
+  <!-- Sidebar -->
   <div class="dashboard">
     <div class="dashboard-header">
-      <h2>
+      <h2>Dashboard</h2>
+    </div>
+    <div class="dashboard-content">
+      <ul>
         <li><a href="{% url 'class:home_view' %}">Courses</a></li>
-        <li><a href="{% url 'class:all_announcements_view' %}">Announcements</a></li> 
+        <li><a href="{% url 'class:all_announcements_view' %}">Announcements</a></li>
         <li><a href="{% url 'class:all_materials_view' %}">Modules</a></li>
         <li><a href="{% url 'class:all_activities_view' %}">Activities</a></li>
         <li><a href="{% url 'class:change_password' %}">Change Password</a></li>
-      </h2>
       </ul>
       <nav class="navbar">
         <ul class="navbar-nav ml-auto">
@@ -193,48 +221,48 @@
     </div>
   </div>
 
-  <!-- Inject content here for pages that extend this template -->
+  <!-- Main content area -->
   <div class="main-content">
-{% block content %}
-<div class="courses">
-   {% for foo in query %}
-     <div class="course-card">
-       <div class="card-header" style="background-image: url('background.jpg');">
-         <div class="progress-indicator">N/A</div>
-         <button class="info-btn">i</button>
-       </div>
-       <div class="card-body">
-         <h3><a href="{% url 'class:course_view' foo.course.id %}">{{ foo.course }}</a></h3>
-         <p>Class Code: {{ foo.course.code }}</p>
-       </div>
-     </div>
-   {% empty %}
-     <p>No courses available.</p>  <!-- Display a message if no courses are found -->
-   {% endfor %}
-</div>
-{% endblock %}
-
+    {% block content %}
+    <div class="courses">
+      {% for foo in query %}
+        <div class="course-card">
+          <div class="card-header" style="background-image: url('background.jpg');">
+            <div class="progress-indicator">N/A</div>
+            <button class="info-btn">i</button>
+          </div>
+          <div class="card-body">
+            <h3><a href="{% url 'class:course_view' foo.course.id %}">{{ foo.course }}</a></h3>
+            <p>Class Code: {{ foo.course.code }}</p>
+          </div>
+        </div>
+      {% empty %}
+        <p>No courses available.</p>
+      {% endfor %}
+    </div>
+    {% endblock %}
   </div>
- {% block scripts %}
 
-  {% endblock scripts %}
+  <!-- Script to toggle dashboard visibility -->
   <script>
     const toggleButton = document.querySelector('.toggle-dashboard');
     const dashboard = document.querySelector('.dashboard');
+    const mainContent = document.querySelector('.main-content');
 
     toggleButton.addEventListener('click', () => {
       dashboard.classList.toggle('hide');
 
-      // Update the button text depending on the dashboard state
+      // Adjust margin based on dashboard visibility
       if (dashboard.classList.contains('hide')) {
+        mainContent.style.marginLeft = '0';
         toggleButton.textContent = 'Show Dashboard';
       } else {
+        mainContent.style.marginLeft = '250px';
         toggleButton.textContent = 'Hide Dashboard';
       }
     });
   </script>
+
 </body>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" ></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </html>
-
-

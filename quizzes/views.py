@@ -74,6 +74,29 @@ def quiz_data_view(request, course_pk, quiz_pk):
         return JsonResponse({'error': 'An internal server error occurred'}, status=500)
 
 
+def create_or_update_quiz_view(request, course_pk=None, quiz_pk=None):
+    # Handle both create and update
+    if quiz_pk:
+        quiz = get_object_or_404(Quiz, pk=quiz_pk)
+    else:
+        quiz = None
+
+    if request.method == 'POST':
+        form = QuizForm(request.POST, instance=quiz)
+        if form.is_valid():
+            saved_quiz = form.save()
+
+            # Debugging: Ensure period is correct
+            print(f"Quiz '{saved_quiz.name}' saved with period: {saved_quiz.period}")
+
+            return redirect('some-view')
+
+    else:
+        form = QuizForm(instance=quiz)
+
+    return render(request, 'crate_quiz.html', {'form': form})
+
+
 def save_quiz_view(request, course_pk, quiz_pk):
     if request.method == 'POST' and request.headers.get('x-requested-with') == 'XMLHttpRequest':
         try:
@@ -81,6 +104,8 @@ def save_quiz_view(request, course_pk, quiz_pk):
             user = request.user
 
             quiz = get_object_or_404(Quiz, pk=quiz_pk)
+            print(f"Quiz '{quiz.name}' period is {quiz.period}")
+
             questions = quiz.question_set.all()
 
             # Check if the user has exceeded their attempts

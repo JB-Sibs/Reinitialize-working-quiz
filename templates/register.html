@@ -8,70 +8,88 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background: #f0f0f0; /* Light background for better readability */
+            background: #f0f0f0; 
             margin: 0;
             padding: 0;
             height: 100vh;
         }
 
         .container {
-            width: 400px; /* Set a fixed width for the form container */
-            margin: 50px auto; /* Center the form horizontally and vertically */
+            width: 90%; /* Use a percentage for responsiveness */
+            max-width: 400px; /* Set a max width */
+            margin: 50px auto; 
             padding: 30px;
-            border-radius: 10px; /* Add rounded corners for a smoother look */
-            background-color: #fff; /* White background for better contrast */
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* Add a more prominent shadow */
+            border-radius: 10px; 
+            background-color: #fff; 
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); 
         }
 
         h2 {
-            text-align: center; /* Center the title */
+            text-align: center; 
             margin-bottom: 20px;
-            color: #890604; /* Match the header color from the guide */
+            color: #890604; 
         }
 
         form {
-            display: flex; /* Use flexbox for better layout on smaller screens */
-            flex-direction: column; /* Stack form elements vertically */
+            display: flex; 
+            flex-direction: column; 
         }
 
         label {
             margin-bottom: 5px;
-            display: block; /* Make labels on separate lines for better alignment */
-            font-weight: bold; /* Make labels bold for better readability */
+            display: block; 
+            font-weight: bold; 
         }
 
         input[type="text"],
         input[type="email"],
         input[type="password"] {
-            padding: 12px; /* Increased padding for better touch targets */
+            padding: 12px; 
             border: 1px solid #ccc;
             border-radius: 5px;
             margin-bottom: 15px;
-            width: 100%; /* Make input fields fill the container width */
-            transition: border-color 0.3s; /* Smooth transition for border color */
+            width: 100%; 
+            transition: border-color 0.3s; 
         }
 
         input[type="text"]:focus,
         input[type="email"]:focus,
         input[type="password"]:focus {
-            border-color: #890604; /* Change border color on focus */
-            outline: none; /* Remove outline */
+            border-color: #890604; 
+            outline: none; 
         }
 
-        button[type="submit"],
-        .back-button {
-            background-color: #890604; /* Use primary color for the buttons */
-            color: #fff; /* White text for better contrast */
-            padding: 12px 15px;
+        button[type="submit"] {
+            background-color: #890604; /* Primary color */
+            color: #fff; /* White text */
+            padding: 12px; /* Consistent padding */
             border: none;
             border-radius: 5px;
-            cursor: pointer; /* Change cursor to pointer on hover */
+            cursor: pointer; 
             margin-top: 10px;
-            width: 100%; /* Make button fill the container width */
-            transition: background-color 0.3s; /* Smooth transition for background color */
+            width: 100%; /* Full width */
+            transition: background-color 0.3s; 
         }
 
-        button[type="submit"]:hover,
+        button[type="submit"]:hover {
+            background-color: #5a0b04; /* Darker shade on hover */
+        }
+
+        .back-button {
+            display: flex; /* Use Flexbox for centering */
+            justify-content: center; /* Center horizontally */
+            align-items: center; /* Center vertically */
+            background-color: #890604; /* Primary color */
+            color: #fff; /* White text */
+            width: 340px; /* Fixed width */
+            height: 48px; /* Fixed height */
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            text-decoration: none; /* Remove underline from link */
+            transition: background-color 0.3s; 
+        }
+
         .back-button:hover {
             background-color: #5a0b04; /* Darker shade on hover */
         }
@@ -80,22 +98,21 @@
             color: red;
             margin-top: 10px;
             padding: 10px;
-            background-color: #f8d7da; /* Light red background for error messages */
-            border: 1px solid #f5c6cb; /* Red border for error messages */
-            border-radius: 5px; /* Rounded corners for error messages */
-            display: none; /* Initially hidden */
+            background-color: #f8d7da; 
+            border: 1px solid #f5c6cb; 
+            border-radius: 5px; 
+            display: none; 
         }
 
         .messages {
             list-style: none;
             padding: 0;
-            margin: 0;
             margin-top: 10px;
         }
 
         .messages li {
             margin-bottom: 5px;
-            color: #155724; /* Dark green for success messages */
+            color: #155724; 
         }
     </style>
 </head>

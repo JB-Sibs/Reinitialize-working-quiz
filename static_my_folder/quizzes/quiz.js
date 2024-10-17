@@ -91,51 +91,48 @@ document.addEventListener('DOMContentLoaded', function () {
             url: dataUrl_save,
             data: data,
             success: function (response) {
-                    const results = response.results;
-                    const passingScore = response.passing_score;
-                    quizForm.classList.add('not-visible');
+                const results = response.results;
+                quizForm.classList.add('not-visible');
 
-                    let resultHTML = '';
-                    let totalQuestions = 0;
-                    let correctAnswers = 0;
+                let resultHTML = '';
+                let totalQuestions = 0;
+                let correctAnswers = 0;
 
-                    results.forEach(res => {
-                        Object.entries(res).forEach(([question, resp]) => {
-                            const answer = data[question] || 'No answer provided';
-                            const correct = resp['correct_answer'] || 'No correct answer provided';
+                // Process the quiz results
+                results.forEach(res => {
+                    Object.entries(res).forEach(([question, resp]) => {
+                        const answer = data[question] || 'No answer provided';
+                        const correct = resp['correct_answer'] || 'No correct answer provided';
 
-                            totalQuestions++;
+                        totalQuestions++;
 
-                            if (resp.correct) {
-                                correctAnswers++;
-                                resultHTML += `
-                                    <div class="p-3 my-3 bg-success">
-                                        <b>Question:</b> ${question}<br>
-                                        Correct Answer: ${correct}<br>
-                                        Your Answer: ${answer}
-                                    </div>`;
-                            } else {
-                                resultHTML += `
-                                    <div class="p-3 my-3 bg-danger">
-                                        <b>Question:</b> ${question}<br>
-                                        Correct Answer: ${correct}<br>
-                                        Your Answer: ${answer}
-                                    </div>`;
-                            }
-                        });
+                        if (resp.correct) {
+                            correctAnswers++;
+                            resultHTML += `
+                                <div class="p-3 my-3 bg-success">
+                                    <b>Question:</b> ${question}<br>
+                                    Correct Answer: ${correct}<br>
+                                    Your Answer: ${answer}
+                                </div>`;
+                        } else {
+                            resultHTML += `
+                                <div class="p-3 my-3 bg-danger">
+                                    <b>Question:</b> ${question}<br>
+                                    Correct Answer: ${correct}<br>
+                                    Your Answer: ${answer}
+                                </div>`;
+                        }
                     });
+                });
 
-                    const score = (correctAnswers / totalQuestions) * 100;
-                    let resultMessage = score >= passingScore
-                        ? 'Congratulations! You passed the quiz!'
-                        : 'Unfortunately, you did not pass. Try again!';
+                // Calculate the final score
+                const score = Math.round((correctAnswers / totalQuestions) * 100); // Round to nearest whole number
+                document.getElementById('quizScore').innerText = score.toFixed(2);  // Show the score
 
-                    document.getElementById('quizScore').innerText = score.toFixed(2);
-                    document.getElementById('quizResultMessage').innerText = resultMessage;
-                    document.getElementById('quizResultsDetails').innerHTML = resultHTML;
-
-                    resultModal.show();
-                },
+                // Show results
+                document.getElementById('quizResultsDetails').innerHTML = resultHTML;
+                resultModal.show();
+            },
             error: function (error) {
                 console.error('Error submitting quiz data:', error);
             }
