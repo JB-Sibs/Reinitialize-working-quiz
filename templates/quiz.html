@@ -7,24 +7,32 @@
 <script src="{% static 'quizzes/quiz.js' %}?v=1" defer></script>
 <script>
     var courseId = "{{ course.id }}";  <!-- Assuming you have access to quiz_info.course.id -->
-
 </script>
 {% endblock scripts %}
 
 {% block content %}
-{{ quiz_info.name }}
-  {% if error_message %}
+<h3>{{ quiz_info.name }}</h3>
+{% if error_message %}
     <div class="alert alert-danger">{{ error_message }}</div>
 {% else %}
     <p>Time Limit: <span id="time_limit">{{ time_limit }}</span> minutes</p>
     <p>Attempts Left: <span id="attempts_left">{{ attempts_left }}</span></p>
     <p id="time_display">Loading timer...</p>
+    
+    {% if attempts_left > 0 %}
+    <!-- Only show form and submit button if there are attempts left -->
+    <form id="quiz_form" class="mb-3">
+        {% csrf_token %}
+        <div id="quiz_box"></div>
+        <button type="submit" class="btn btn-danger mt-3">Submit</button>
+    </form>
+    {% else %}
+    <!-- Message indicating that attempts are exhausted -->
+    <div class="alert alert-warning">
+        You have used all your attempts for this quiz.
+    </div>
     {% endif %}
-<form id="quiz_form" class="mb-3">
-    {% csrf_token %}
-    <div id="quiz_box"></div>
-    <button type="submit" class="btn btn-danger mt-3">Submit</button>
-</form>
+{% endif %}
 
 <!-- Modal for showing results -->
 <div class="modal fade" id="resultModal" tabindex="-1" aria-labelledby="resultModalLabel" aria-hidden="true">

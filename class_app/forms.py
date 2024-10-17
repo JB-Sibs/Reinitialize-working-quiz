@@ -75,12 +75,28 @@ class EnrollmentFormAdmin(forms.ModelForm):
 
         return cleaned_data
 
+
+from django import forms
+from django.contrib.auth.forms import UserCreationForm
+from django.core.exceptions import ValidationError
+from .models import User  # Ensure you import your custom user model
+
+
 class CustomUserCreationForm(UserCreationForm):
     email = forms.EmailField(required=True)  # Make email required
 
+    # Choices for user roles
+    ROLE_CHOICES = [
+        ('professor', 'Professor'),
+        ('student', 'Student'),
+        ('admin', 'Admin'),
+    ]
+
+    role = forms.ChoiceField(choices=ROLE_CHOICES, required=True, label="Select Role")
+
     class Meta:
         model = User
-        fields = ('username', 'email', 'password1', 'password2', 'is_professor', 'is_student', 'is_admin')
+        fields = ('username', 'email', 'password1', 'password2', 'role')  # Include only the role field
 
     def clean_email(self):
         email = self.cleaned_data.get('email')
@@ -96,10 +112,12 @@ class CustomUserCreationForm(UserCreationForm):
 
     def save(self, commit=True):
         user = super().save(commit=False)
-        # Set the user roles based on form input
-        user.is_professor = self.cleaned_data.get('is_professor')
-        user.is_student = self.cleaned_data.get('is_student')
-        user.is_admin = self.cleaned_data.get('is_admin')
+        # Set the user role based on form input
+        selected_role = self.cleaned_data.get('role')
+        user.is_professor = selected_role == 'professor'
+        user.is_student = selected_role == 'student'
+        user.is_admin = selected_role == 'admin'
+
         if commit:
             user.save()
         return user

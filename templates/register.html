@@ -1,9 +1,136 @@
 <!DOCTYPE html>
 <html lang="en">
-  <h2>Register</h2>
-  <form method="post">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration Form</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f0f0; /* Light background for better readability */
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+        }
+
+        .container {
+            width: 400px; /* Set a fixed width for the form container */
+            margin: 50px auto; /* Center the form horizontally and vertically */
+            padding: 30px;
+            border-radius: 10px; /* Add rounded corners for a smoother look */
+            background-color: #fff; /* White background for better contrast */
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* Add a more prominent shadow */
+        }
+
+        h2 {
+            text-align: center; /* Center the title */
+            margin-bottom: 20px;
+            color: #890604; /* Match the header color from the guide */
+        }
+
+        form {
+            display: flex; /* Use flexbox for better layout on smaller screens */
+            flex-direction: column; /* Stack form elements vertically */
+        }
+
+        label {
+            margin-bottom: 5px;
+            display: block; /* Make labels on separate lines for better alignment */
+            font-weight: bold; /* Make labels bold for better readability */
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"] {
+            padding: 12px; /* Increased padding for better touch targets */
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            width: 100%; /* Make input fields fill the container width */
+            transition: border-color 0.3s; /* Smooth transition for border color */
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="password"]:focus {
+            border-color: #890604; /* Change border color on focus */
+            outline: none; /* Remove outline */
+        }
+
+        button[type="submit"],
+        .back-button {
+            background-color: #890604; /* Use primary color for the buttons */
+            color: #fff; /* White text for better contrast */
+            padding: 12px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer; /* Change cursor to pointer on hover */
+            margin-top: 10px;
+            width: 100%; /* Make button fill the container width */
+            transition: background-color 0.3s; /* Smooth transition for background color */
+        }
+
+        button[type="submit"]:hover,
+        .back-button:hover {
+            background-color: #5a0b04; /* Darker shade on hover */
+        }
+
+        .error {
+            color: red;
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f8d7da; /* Light red background for error messages */
+            border: 1px solid #f5c6cb; /* Red border for error messages */
+            border-radius: 5px; /* Rounded corners for error messages */
+            display: none; /* Initially hidden */
+        }
+
+        .messages {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            margin-top: 10px;
+        }
+
+        .messages li {
+            margin-bottom: 5px;
+            color: #155724; /* Dark green for success messages */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Register</h2>
+        <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
-    <button type="submit">Register</button>
-  </form>
+    <button type="submit" class="btn">Register</button>
+</form>
+        <a href="{% url 'class:admin_custom_view' %}" class="back-button">Back to Homepage</a>
+
+        {% if form.errors %}
+            <div class="error" style="display:block;">
+                <ul>
+                    {% for field in form %}
+                        {% for error in field.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    {% endfor %}
+                    {% for error in form.non_field_errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
+        {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+</body>
 </html>

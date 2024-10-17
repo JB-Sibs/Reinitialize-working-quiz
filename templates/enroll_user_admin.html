@@ -1,4 +1,3 @@
-<!-- templates/enroll_user.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,103 +8,150 @@
     <style>
         body {
             font-family: 'Roboto', sans-serif;
-            background-color: #f0f0f0; /* Light grey background */
+            background-color: #f4f7f6;
             margin: 0;
             padding: 0;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh; /* Center vertically */
+            min-height: 100vh;
         }
 
         .container {
             background-color: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            max-width: 600px; /* Increased max-width for better layout */
-            width: 90%; /* Added margin from the sides */
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
+            max-width: 900px;
+            width: 100%;
             transition: all 0.3s ease;
         }
 
-        .container:hover {
-            box-shadow: 0 6px 30px rgba(0, 0, 0, 0.15); /* Hover effect for container */
+        h2, h3 {
+            color: #5c5c5c;
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 700;
         }
 
         h2 {
-            text-align: center;
-            color: #800000; /* Dark red color */
-            font-size: 28px; /* Increased font size for main title */
-            margin-bottom: 20px;
-            letter-spacing: 1px;
-            border-bottom: 2px solid #e03e31; /* Decorative underline */
-            padding-bottom: 10px; /* Padding below the title */
+            font-size: 36px;
         }
 
         h3 {
-            color: #343a40; /* Dark text color */
-            font-size: 22px; /* Font size for course names */
-            margin-top: 25px;
-            margin-bottom: 10px; /* Space below course names */
-            padding-bottom: 5px; /* Space below course names */
-            border-bottom: 1px solid #e0e0e0; /* Subtle underline */
+            font-size: 26px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            color: #e03e31;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 5px;
         }
 
-        ul {
-            list-style-type: none; /* Remove default bullet points */
-            padding-left: 0; /* Remove padding */
-            margin-top: 10px; /* Space above the list */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 25px;
+            background-color: #ffffff;
         }
 
-        li {
-            background-color: #ffffff; /* White background for list items */
-            padding: 15px; /* Padding inside list items */
-            margin-bottom: 10px; /* Spacing between list items */
-            border-radius: 8px; /* Rounded corners */
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-            display: flex;
-            justify-content: space-between; /* Space between text and button */
-            align-items: center; /* Center items vertically */
-            transition: box-shadow 0.3s; /* Transition for shadow effect */
+        table, th, td {
+            border: 1px solid #ddd;
         }
 
-        li:hover {
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* Stronger shadow on hover */
+        th, td {
+            padding: 15px;
+            text-align: left;
+            font-size: 16px;
+        }
+
+        th {
+            background-color: #f4f7f6;
+            color: #333;
+            font-weight: bold;
+        }
+
+        td {
+            background-color: #fff;
+            color: #555;
         }
 
         button {
-            background-color: #e03e31; /* Canvas red */
+            background-color: #e03e31;
             color: white;
-            padding: 10px 15px; /* Padding for buttons */
-            border-radius: 5px; /* Rounded corners */
+            padding: 10px 20px;
             border: none;
+            border-radius: 5px;
             cursor: pointer;
             font-weight: bold;
-            transition: background-color 0.3s ease, transform 0.2s ease; /* Transition for hover effect */
+            transition: all 0.3s ease;
+            font-size: 14px;
         }
 
         button:hover {
-            background-color: #c52a24; /* Darker red on hover */
-            transform: translateY(-2px); /* Slight upward movement on hover */
-        }
-
-        .enroll-form {
-            margin-top: 30px; /* Space above enrollment form */
-            padding: 20px;
-            background-color: #f9f9f9; /* Light background for the form */
-            border-radius: 10px; /* Rounded corners */
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Shadow for form container */
-        }
-
-        .form-group {
-            margin-top: 20px; /* Space above submit button */
+            background-color: #c52a24;
+            transform: translateY(-2px);
         }
 
         .no-enrollment-message {
-            text-align: center; 
-            color: #888; 
-            font-style: italic; 
-            margin: 10px 0; /* Margin around the message */
+            text-align: center;
+            color: #888;
+            font-style: italic;
+            font-size: 16px;
+        }
+
+        .enroll-form {
+            margin-top: 40px;
+            padding: 30px;
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group {
+            margin-top: 20px;
+        }
+
+        .form-group button {
+            width: 100%;
+            padding: 15px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .back-button {
+            display: block;
+            margin-top: 20px;
+            text-align: center;
+            background-color: #5c5c5c;
+            color: white;
+            padding: 10px 0;
+            text-decoration: none;
+            font-weight: bold;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .back-button:hover {
+            background-color: #444;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            h2 {
+                font-size: 28px;
+            }
+
+            h3 {
+                font-size: 22px;
+            }
+
+            th, td {
+                font-size: 14px;
+            }
+
+            .form-group button {
+                font-size: 14px;
+            }
         }
     </style>
 </head>
@@ -118,26 +164,39 @@
     {% for course in courses %}
         <h3>{{ course.name }}</h3>
 
-        <!-- Check if there are enrollments for the course -->
-        <ul>
-        {% for enrollment in enrollments %}
-            {% if enrollment.course == course %}
-                <li>
-                    {{ enrollment.user.username }}
-                    <!-- Delete Button -->
-                    <form method="post" style="display:inline;">
-                        {% csrf_token %}
-                        <input type="hidden" name="delete_enrollment" value="{{ enrollment.id }}">
-                        <button type="submit" onclick="return confirm('Are you sure you want to delete this enrollment?');">
-                            Delete
-                        </button>
-                    </form>
-                </li>
-            {% endif %}
-        {% empty %}
-                <li class="no-enrollment-message">No users enrolled in this course.</li>
-        {% endfor %}
-        </ul>
+        <!-- Create a table for each course -->
+        <table>
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+            <!-- Loop through enrollments and check if they belong to the current course -->
+            {% for enrollment in enrollments %}
+                {% if enrollment.course == course %}
+                <tr>
+                    <td>{{ enrollment.user.username }}</td>
+                    <td>
+                        <form method="post" style="display:inline;">
+                            {% csrf_token %}
+                            <input type="hidden" name="delete_enrollment" value="{{ enrollment.id }}">
+                            <button type="submit" onclick="return confirm('Are you sure you want to delete this enrollment?');">
+                                Delete
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% endif %}
+            {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- If there are no enrollments for the course -->
+        {% if not enrollments %}
+            <p class="no-enrollment-message">No users enrolled in this course.</p>
+        {% endif %}
     {% endfor %}
 
     <!-- Enrollment Form Section -->
@@ -145,15 +204,15 @@
     <div class="enroll-form">
         <form method="post">
             {% csrf_token %}
-            
-            {{ form.as_p }} <!-- Maintain existing form layout -->
-            
+            {{ form.as_p }}
             <div class="form-group">
                 <button type="submit" name="enroll">Enroll</button>
             </div>
-            
         </form>
     </div>
+
+    <!-- Back to Homepage Button -->
+    <a href="{% url 'class:admin_custom_view' %}" class="back-button">Back to Homepage</a>
 </div>
 
 </body>

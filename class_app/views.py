@@ -317,6 +317,8 @@ def all_activities_view(request):
         # Fetch all quizzes related to those courses
         quizzes = Quiz.objects.filter(course__in=user_courses)
 
+        print_mo_to = Quiz.objects.filter(course__in=user_courses).values('time_limit')
+        print(print_mo_to)
         # Fetch grades for quizzes related to these courses
         results = Grade.objects.filter(quiz__course__in=user_courses, user=request.user).values('quiz__name', 'score', 'quiz__course_id')
 
@@ -578,7 +580,7 @@ def enroll_user_admin(request):
         if form.is_valid():
             form.save()
 
-            return redirect('class:admin_custom_view')
+            return redirect('class:enroll_user_admin')
 
     # Handle enrollment deletion
     if request.method == 'POST' and 'delete_enrollment' in request.POST:
