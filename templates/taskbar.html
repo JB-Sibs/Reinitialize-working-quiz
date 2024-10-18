@@ -137,7 +137,7 @@
 </head>
 <body>
   
-{#  {% if user.is_student or user.is_admin or user.is_professor %}#}
+  {% if user.is_student or user.is_professor %}
   <div class="dashboard">
     <div class="dashboard-header">
   <button class="toggle-dashboard">Hide Dashboard</button> <!-- Button now says "Hide" by default -->
@@ -174,7 +174,46 @@
       </nav>
     </div>
   </div>
-
+    {%  endif %}
+  
+  {% if user.is_admin %}
+  <div class="dashboard">
+    <div class="dashboard-header">
+  <button class="toggle-dashboard">Hide Dashboard</button> <!-- Button now says "Hide" by default -->
+    </div>
+    <div class="dashboard-content">
+      <ul>
+<li>
+    <a href="{% if user.is_admin %}{% url 'class:admin_custom_view' %}{% elif user.is_student or user.is_professor %}{% url 'class:home_view' %}{% else %}{% url 'class:professor_courses_view' %}{% endif %}">
+        Courses
+    </a>
+</li>
+          {% if obj and obj.pk %}
+            
+          <li><a href="{% url 'class:course_view' obj.pk %}">Home</a></li>
+{#          <li><a href="{% url 'class:announcement_view' obj.pk %}">Announcements</a></li>#}
+{#          <li><a href="{% url 'class:materials_view' obj.pk %}">Modules</a></li>#}
+{#          <li><a href="{% url 'class:activities_view' obj.pk %}">Activities / Quizzes</a></li>#}
+{#          <li><a href="{% url 'class:grades_view' obj.pk %}">Grades</a></li>#}
+        {% else %}
+          <span>
+{#            <li><a href="{% url 'class:all_announcements_view' %}">Announcements</a></li>#}
+{#            <li><a href="{% url 'class:all_materials_view' %}">Modules</a></li>#}
+{#            <li><a href="{% url 'class:all_activities_view' %}">Activities / Quizzes</a></li>#}
+          </span>
+        {% endif %}
+        <li><a href="{% url 'class:change_password' %}">Change Password</a></li>
+      </ul>
+      <nav class="navbar">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'class:logout' %}">Logout</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+    {%  endif %}
   <!-- Inject content here for pages that extend this template -->
   <div class="main-content">
     {% block content %}

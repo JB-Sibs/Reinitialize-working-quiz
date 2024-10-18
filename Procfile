@@ -1,0 +1,1 @@
+web: gunicorn Canvas_campus.wsgi

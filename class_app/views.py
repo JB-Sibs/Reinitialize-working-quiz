@@ -567,27 +567,12 @@ def grades_view(request, pk):
     # Fetch the course object based on the primary key
     obj = Course.objects.get(pk=pk)
 
-    # Initialize variables for context
-    exam_results_prof = None  # Initialize to avoid UnboundLocalError
-    results_prof = None  # Initialize to avoid UnboundLocalError
-    student_grades = []  # Initialize to avoid UnboundLocalError
-    results = None  # Initialize to avoid UnboundLocalError
-    exam_results = None  # Initialize to avoid UnboundLocalError
-    prelim_final = None  # Initialize to avoid UnboundLocalError
-    prelim_transmuted = None  # Initialize to avoid UnboundLocalError
-    prelim_classification = None  # Initialize to avoid UnboundLocalError
-    midterm_final = None  # Initialize to avoid UnboundLocalError
-    midterm_transmuted = None  # Initialize to avoid UnboundLocalError
-    midterm_classification = None  # Initialize to avoid UnboundLocalError
-    final_final = None  # Initialize to avoid UnboundLocalError
-    final_transmuted = None  # Initialize to avoid UnboundLocalError
-    final_classification = None  # Initialize to avoid UnboundLocalError
-    final_grade_average = None  # Initialize to avoid UnboundLocalError
-
     # Check if the user is a professor
-    if request.user.is_professor or request.user.is_admin:
-        # Fetch all students enrolled in this course
+    if request.user.is_professor:
+        # Fetch all enrollments related to this course
         enrollments = Enrollment.objects.filter(course=obj)
+
+        # Fetch all students enrolled in the course using the 'user' field from Enrollment
         students = [enrollment.user for enrollment in enrollments]
 
         # Fetch quiz and exam results for all students
@@ -595,13 +580,14 @@ def grades_view(request, pk):
         exam_results_prof = ExamResult.objects.filter(course=obj)
 
         # Calculate grades for each student
+        student_grades = []
         for student in students:
             prelim_final, prelim_transmuted, prelim_classification = get_prelim_grades(student, obj)
             midterm_final, midterm_transmuted, midterm_classification = get_midterm_grades(student, obj)
             final_final, final_transmuted, final_classification = get_final_grades(student, obj)
 
-            # total_final_grades = prelim_final + midterm_final + final_final
-            # final_grade_average = total_final_grades / 3
+            total_final_grades = prelim_final + midterm_final + final_final
+            final_grade_average = total_final_grades / 3
 
             student_grades.append({
                 'student': student,
@@ -632,31 +618,15 @@ def grades_view(request, pk):
         total_final_grades = prelim_final + midterm_final + final_final
         final_grade_average = total_final_grades / 3
 
-    # Pass context to the template, including the grades
-    context = {
-        'obj': obj,
-        'results': results,  # Passing both the quiz name and score
-        'exam_results': exam_results,  # Passing the exam results to the template
-        'exam_results_prof': exam_results_prof,  # Passing the exam results to the template
-        'results_prof': results_prof,
-
-        # Prelim grade information
-        'prelim_final': prelim_final,
-        'prelim_transmuted': prelim_transmuted,
-        'prelim_classification': prelim_classification,
-
-        # Midterm grade information
-        'midterm_final': midterm_final,
-        'midterm_transmuted': midterm_transmuted,
-        'midterm_classification': midterm_classification,
-
-        # Final grade information
-        'final_final': final_final,
-        'final_transmuted': final_transmuted,
-        'final_classification': final_classification,
-
-        'final_grade_average': final_grade_average,
-    }
+        context = {
+            'obj': obj,
+            'results': results,
+            'exam_results': exam_results,
+            'prelim_final': prelim_final,
+            'midterm_final': midterm_final,
+            'final_final': final_final,
+            'final_grade_average': final_grade_average,
+        }
 
     return render(request, 'grades_view.html', context)
 

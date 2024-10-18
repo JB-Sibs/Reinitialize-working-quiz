@@ -68,12 +68,6 @@
             <h1 class="mb-4 text-center">{{ obj.name }} Materials</h1>
             <hr>
 
-            {% if user.is_professor or user.is_admin %}
-                <a href="{% url 'class:add_module' obj.pk %}">
-                    <button type="button" class="custom-btn">Add Material</button>
-                </a>
-            {% endif %}
-
             <!-- Loop through materials and create cards for each -->
             <div class="row">
                 {% for material in materials %}

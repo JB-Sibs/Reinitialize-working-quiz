@@ -18,34 +18,63 @@
     </script>
 {% endblock scripts %}
 
-{% block content %}
-    <!-- Main Content -->
-    <div class="content-container">
-        <h1>{{ obj.name }} Announcements</h1>
-        <div class="main-content">
-      <div class="timeline"> <!-- Announcement timeline style -->
-        <ul class="timeline">
-    {% for announcement in announcements %}
-    <li>
-        <div class="timeline-time">
-            <span class="date">{{ announcement.posted_on|date:"F d, Y" }}</span>
-        </div>
-        <div class="timeline-icon">
-            <a href="#"></a>
-        </div>
-        <div class="timeline-body">
-            <div class="timeline-header">
-                <h3 class="timeline-title">{{ announcement.title }}</h3>
-            </div>
-            <div class="timeline-content">
-                <p>{{ announcement.content }}</p>
-            </div>
-        </div>
-    </li>
-    {% endfor %}
-</ul>
+<style type="text/css">
+.button-container {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
 
-      </div>
+.custom-btn {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.button-container a {
+    text-decoration: none;
+}
+
+
+{% block content %}
+ <div class="content-container">
+    <h1>{{ obj.name }} Announcements</h1>
+    <div class="main-content">
+        <!-- Add Announcement Button for Professors (positioned in the top-right) -->
+        {% if user.is_professor or user.is_admin %}
+        <div class="button-container">
+            <a href="{% url 'class:add_announcement' obj.pk %}">
+                <button type="button" class="custom-btn">Add Announcement</button>
+            </a>
+        </div>
+        {% endif %}
+
+        <div class="timeline"> <!-- Announcement timeline style -->
+            <ul class="timeline">
+                {% for announcement in announcements %}
+                <li>
+                    <div class="timeline-time">
+                        <span class="date">{{ announcement.posted_on|date:"F d, Y" }}</span>
+                    </div>
+                    <div class="timeline-icon">
+                        <a href="#"></a>
+                    </div>
+                    <div class="timeline-body">
+                        <div class="timeline-header">
+                            <h3 class="timeline-title">{{ announcement.title }}</h3>
+                        </div>
+                        <div class="timeline-content">
+                            <p>{{ announcement.content }}</p>
+                        </div>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
     </div>
         <h1>{{ obj.name }} Materials</h1>
 
@@ -313,49 +342,49 @@
         </div>
         {% endif %}
         {% endif %}
-    {% if user.is_professor %}
-<div class="grades-card">
-    <h3>Student Grades Overview</h3>
-    {% for student, grades in student_grades.items %}
-
-        {% comment %} Check if the current user is a professor and skip grades display {% endcomment %}
-        {% if not student == user.username %} 
-                    <h4>{{ student }}</h4>
-<!-- Check if the student is not the current user -->
-            {% if grades.prelim_final or grades.prelim_transmuted or grades.prelim_classification %}
-            <div>
-                <h5>Prelim Grades</h5>
-                {% if grades.prelim_final %}<p><strong>Final Grade:</strong> {{ grades.prelim_final|floatformat:"2" }}</p>{% endif %}
-                {% if grades.prelim_transmuted %}<p><strong>Transmuted Grade:</strong> {{ grades.prelim_transmuted|floatformat:"2" }}</p>{% endif %}
-                {% if grades.prelim_classification %}<p><strong>Classification:</strong> {{ grades.prelim_classification }}</p>{% endif %}
-            </div>
-            {% endif %}
-
-            {% if grades.midterm_final or grades.midterm_transmuted or grades.midterm_classification %}
-            <div>
-                <h5>Midterm Grades</h5>
-                {% if grades.midterm_final %}<p><strong>Final Grade:</strong> {{ grades.midterm_final|floatformat:"2" }}</p>{% endif %}
-                {% if grades.midterm_transmuted %}<p><strong>Transmuted Grade:</strong> {{ grades.midterm_transmuted|floatformat:"2" }}</p>{% endif %}
-                {% if grades.midterm_classification %}<p><strong>Classification:</strong> {{ grades.midterm_classification }}</p>{% endif %}
-            </div>
-            {% endif %}
-
-            {% if grades.final_final or grades.final_transmuted or grades.final_classification %}
-            <div>
-                <h5>Final Grades</h5>
-                {% if grades.final_final %}<p><strong>Final Grade:</strong> {{ grades.final_final|floatformat:"2" }}</p>{% endif %}
-                {% if grades.final_transmuted %}<p><strong>Transmuted Grade:</strong> {{ grades.final_transmuted|floatformat:"2" }}</p>{% endif %}
-                {% if grades.final_classification %}<p><strong>Classification:</strong>{{ grades.final_classification }}</p>{% endif %}
-            
-            </div>
-                
-            {% endif %}
-        {% else %}
-        {% endif %}
-        
-    {% endfor %}
-</div>
-{% endif %}
+{#    {% if user.is_professor or user.is_admin %}#}
+{#<div class="grades-card">#}
+{#    <h3>Student Grades Overview</h3>#}
+{#    {% for student, grades in student_grades.items %}#}
+{##}
+{#        {% comment %} Check if the current user is a professor and skip grades display {% endcomment %}#}
+{#        {% if not student == user.username %} #}
+{#                    <h4>{{ student }}</h4>#}
+{#<!-- Check if the student is not the current user -->#}
+{#            {% if grades.prelim_final or grades.prelim_transmuted or grades.prelim_classification %}#}
+{#            <div>#}
+{#                <h5>Prelim Grades</h5>#}
+{#                {% if grades.prelim_final %}<p><strong>Final Grade:</strong> {{ grades.prelim_final|floatformat:"2" }}</p>{% endif %}#}
+{#                {% if grades.prelim_transmuted %}<p><strong>Transmuted Grade:</strong> {{ grades.prelim_transmuted|floatformat:"2" }}</p>{% endif %}#}
+{#                {% if grades.prelim_classification %}<p><strong>Classification:</strong> {{ grades.prelim_classification }}</p>{% endif %}#}
+{#            </div>#}
+{#            {% endif %}#}
+{##}
+{#            {% if grades.midterm_final or grades.midterm_transmuted or grades.midterm_classification %}#}
+{#            <div>#}
+{#                <h5>Midterm Grades</h5>#}
+{#                {% if grades.midterm_final %}<p><strong>Final Grade:</strong> {{ grades.midterm_final|floatformat:"2" }}</p>{% endif %}#}
+{#                {% if grades.midterm_transmuted %}<p><strong>Transmuted Grade:</strong> {{ grades.midterm_transmuted|floatformat:"2" }}</p>{% endif %}#}
+{#                {% if grades.midterm_classification %}<p><strong>Classification:</strong> {{ grades.midterm_classification }}</p>{% endif %}#}
+{#            </div>#}
+{#            {% endif %}#}
+{##}
+{#            {% if grades.final_final or grades.final_transmuted or grades.final_classification %}#}
+{#            <div>#}
+{#                <h5>Final Grades</h5>#}
+{#                {% if grades.final_final %}<p><strong>Final Grade:</strong> {{ grades.final_final|floatformat:"2" }}</p>{% endif %}#}
+{#                {% if grades.final_transmuted %}<p><strong>Transmuted Grade:</strong> {{ grades.final_transmuted|floatformat:"2" }}</p>{% endif %}#}
+{#                {% if grades.final_classification %}<p><strong>Classification:</strong>{{ grades.final_classification }}</p>{% endif %}#}
+{#            #}
+{#            </div>#}
+{#                #}
+{#            {% endif %}#}
+{#        {% else %}#}
+{#        {% endif %}#}
+{#        #}
+{#    {% endfor %}#}
+{#</div>#}
+{#{% endif %}#}
     
     {% if user.is_professor or user.is_admin %}
     <a href="{% url 'class:enroll_student' obj.pk %}">
