@@ -52,8 +52,64 @@
                 </tr>
                 {% endfor %}
             </tbody>
-        </table>
+        </table>            
         {% endif %}
+    
+    {% if user.is_student %}
+        <!-- Prelim, Midterm, Final Grades -->
+        {% if prelim_final or prelim_transmuted or prelim_classification %}
+        <div class="grades-card">
+            <h3>Prelim Grades</h3>
+            {% if prelim_final %}<p><strong>Final Grade:</strong> {{ prelim_final|floatformat:"2" }}</p>{% endif %}
+            {% if prelim_transmuted %}<p><strong>Transmuted Grade:</strong> {{ prelim_transmuted|floatformat:"2" }}</p>{% endif %}
+            {% if prelim_classification %}<p><strong>Classification:</strong> {{ prelim_classification }}</p>{% endif %}
+        </div>
+        {% endif %}
+        {% if midterm_final or midterm_transmuted or midterm_classification %}
+        <div class="grades-card">
+            <h3>Midterm Grades</h3>
+            {% if midterm_final %}<p><strong>Final Grade:</strong> {{ midterm_final|floatformat:"2" }}</p>{% endif %}
+            {% if midterm_transmuted %}<p><strong>Transmuted Grade:</strong> {{ midterm_transmuted|floatformat:"2" }}</p>{% endif %}
+            {% if midterm_classification %}<p><strong>Classification:</strong> {{ midterm_classification }}</p>{% endif %}
+        </div>
+        {% endif %}
+        {% if final_final or final_transmuted or final_classification %}
+        <div class="grades-card">
+            <h3>Final Grades</h3>
+            {% if final_final %}<p><strong>Final Grade:</strong> {{ final_final|floatformat:"2" }}</p>{% endif %}
+            {% if final_transmuted %}<p><strong>Transmuted Grade:</strong> {{ final_transmuted|floatformat:"2" }}</p>{% endif %}
+            {% if final_classification %}<p><strong>Classification:</strong> {{ final_classification }}</p>{% endif %}
+        </div>
+            
+            <div class="grades-card">
+            <h2>Final Computation of Grades: {{ final_grade_average|floatformat:"2" }}</h2>
+            <h2>Transmuted Grade: 
+                {% if final_grade_average >= 95.2000 %}
+                    1.00 (Outstanding)
+                {% elif final_grade_average >= 90.4000 and final_grade_average < 95.2000 %}
+                    1.25 (Excellent)
+                {% elif final_grade_average >= 85.6000 and final_grade_average < 90.4000 %}
+                    1.50 (Superior)
+                {% elif final_grade_average >= 80.8000 and final_grade_average < 85.6000 %}
+                    1.75 (Very Good)
+                {% elif final_grade_average >= 76.0000 and final_grade_average < 80.8000 %}
+                    2.00 (Good)
+                {% elif final_grade_average >= 71.2000 and final_grade_average < 76.0000 %}
+                    2.25 (Satisfactory)
+                {% elif final_grade_average >= 66.4000 and final_grade_average < 71.2000 %}
+                    2.50 (Fairly Satisfactory)
+                {% elif final_grade_average >= 61.6000 and final_grade_average < 66.4000 %}
+                    2.75 (Fair)
+                {% elif final_grade_average >= 60.0000 and final_grade_average < 61.6000 %}
+                    3.00 (Passed)
+                {% else %}
+                    5.00 (Failed)
+                {% endif %}
+            </h2>
+            </div>
+        {% endif %}
+    
+        {% endif %}  <!-- Close the first user.is_student if -->
 
         <!-- Professor View -->
         {% if user.is_professor %}
@@ -107,49 +163,49 @@
                 <tr>
                     <td colspan="5" class="text-center">No exam results available.</td>
                 </tr>
-                    
                 {% endfor %}
             </tbody>
         </table>
-            <!-- Add exam results button for professors -->
-    <a href="{% url 'class:add_exam_result' obj.pk %}">
-        <button type="button" class="custom-btn">Add exam results</button>
-    </a>
+        
+        <!-- Add exam results button for professors -->
+        <a href="{% url 'class:add_exam_result' obj.pk %}">
+            <button type="button" class="custom-btn">Add exam results</button>
+        </a>
 
         <!-- Student Grades Overview (Professors) -->
-      <div class="grades-card">
-    <h3>Student Grades Overview</h3>
-    <table class="table table-bordered mt-3">
-        <thead>
-            <tr>
-                <th>Student Name</th>
-                <th>Prelim Grade</th>
-                <th>Midterm Grade</th>
-                <th>Final Grade</th>
-                <th>Average</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for grade in student_grades %}
-                <!-- Avoid showing professor's own grades -->
-                {% if not grade.student.username == user.username %}
-                <tr>
-                    <td>{{ grade.student.username }}</td>
-                    <td>{{ grade.prelim_final|floatformat:"2" }}</td>
-                    <td>{{ grade.midterm_final|floatformat:"2" }}</td>
-                    <td>{{ grade.final_final|floatformat:"2" }}</td>
-                    <td>{{ grade.final_grade_average|floatformat:"2" }}</td>
-                </tr>
-                {% endif %}
-            {% empty %}
-            <tr>
-                <td colspan="5" class="text-center">No grades available for students.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
-        {% endif %}
+        <div class="grades-card">
+            <h3>Student Grades Overview</h3>
+            <table class="table table-bordered mt-3">
+                <thead>
+                    <tr>
+                        <th>Student Name</th>
+                        <th>Prelim Grade</th>
+                        <th>Midterm Grade</th>
+                        <th>Final Grade</th>
+                        <th>Average</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for grade in student_grades %}
+                        <!-- Avoid showing professor's own grades -->
+                        {% if not grade.student.username == user.username %}
+                        <tr>
+                            <td>{{ grade.student.username }}</td>
+                            <td>{{ grade.prelim_final|floatformat:"2" }}</td>
+                            <td>{{ grade.midterm_final|floatformat:"2" }}</td>
+                            <td>{{ grade.final_final|floatformat:"2" }}</td>
+                            <td>{{ grade.final_grade_average|floatformat:"2" }}</td>
+                        </tr>
+                        {% endif %}
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center">No grades available for students.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}  <!-- Close the user.is_professor if -->
     </div>
     {% endblock %}
 </div>

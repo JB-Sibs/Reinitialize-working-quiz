@@ -17,28 +17,6 @@ from django.shortcuts import get_object_or_404
 from quizzes.models import Quiz  # Import the Quiz model
 
 
-def calculate_quiz_grade(grades):
-    total_score = sum([grade.score for grade in grades])
-    total_items = sum([grade.quiz.no_of_questions for grade in grades])
-
-    if total_items == 0:
-        return 0
-
-    # Formula: [(score1 + score2) / (total1 + total2)] * 60
-    return (total_score / total_items) * 60
-
-
-def calculate_exam_grade(exams):
-    total_score = sum([exam.score for exam in exams])
-    total_items = sum([exam.total_items for exam in exams])
-
-    if total_items == 0:
-        return 0
-
-    # Formula: [(score1 + score2) / (total1 + total2)] * 40
-    return (total_score / total_items) * 40
-
-
 def admin_custom_view(request):
     courses = Course.objects.all()
 
@@ -525,18 +503,34 @@ def announcements_view(request, class_id):
     return render(request, 'announcement_view.html', {'announcements': announcements})
 
 
+def calculate_exam_grade(exams):
+    total_score = sum([exam.score for exam in exams])
+    total_items = sum([exam.total_items for exam in exams])
+
+    if total_items == 0:
+        return 0
+
+    # Formula: [(score1 + score2) / (total1 + total2)] * 40
+    return (total_score / total_items) * 40
+
+
+def calculate_quiz_grade(grades):
+    total_score = sum([grade.score for grade in grades])
+    total_items = sum([grade.quiz.no_of_questions for grade in grades])
+
+    if total_items == 0:
+        return 0
+
+    # Formula: [(score1 + score2) / (total1 + total2)] * 60
+    return (total_score / total_items) * 60
+
+
 def get_grades_by_period(user, period, course):
     # Retrieve quizzes based on the user, period, and course
     quizzes = Grade.objects.filter(user=user, quiz__period=period, quiz__course=course)
 
     # Retrieve exams based on the user, period, and course (use course directly)
     exams = ExamResult.objects.filter(student=user, period=period, course=course)
-
-    # Debugging: Print the quizzes and exams fetched for this period and course
-    print(f"Fetching grades for {user.username} in period: {period} and course: {course.name}")
-    print(
-        f"Quizzes found: {[quiz.quiz.name for quiz in quizzes]} with periods: {[quiz.quiz.period for quiz in quizzes]}")
-    print(f"Exams found: {[exam.exam_name for exam in exams]} with periods: {[exam.period for exam in exams]}")
 
     # Calculate the quiz and exam grades
     quiz_grade = calculate_quiz_grade(quizzes)
@@ -573,8 +567,25 @@ def grades_view(request, pk):
     # Fetch the course object based on the primary key
     obj = Course.objects.get(pk=pk)
 
+    # Initialize variables for context
+    exam_results_prof = None  # Initialize to avoid UnboundLocalError
+    results_prof = None  # Initialize to avoid UnboundLocalError
+    student_grades = []  # Initialize to avoid UnboundLocalError
+    results = None  # Initialize to avoid UnboundLocalError
+    exam_results = None  # Initialize to avoid UnboundLocalError
+    prelim_final = None  # Initialize to avoid UnboundLocalError
+    prelim_transmuted = None  # Initialize to avoid UnboundLocalError
+    prelim_classification = None  # Initialize to avoid UnboundLocalError
+    midterm_final = None  # Initialize to avoid UnboundLocalError
+    midterm_transmuted = None  # Initialize to avoid UnboundLocalError
+    midterm_classification = None  # Initialize to avoid UnboundLocalError
+    final_final = None  # Initialize to avoid UnboundLocalError
+    final_transmuted = None  # Initialize to avoid UnboundLocalError
+    final_classification = None  # Initialize to avoid UnboundLocalError
+    final_grade_average = None  # Initialize to avoid UnboundLocalError
+
     # Check if the user is a professor
-    if request.user.is_professor:
+    if request.user.is_professor or request.user.is_admin:
         # Fetch all students enrolled in this course
         enrollments = Enrollment.objects.filter(course=obj)
         students = [enrollment.user for enrollment in enrollments]
@@ -584,14 +595,13 @@ def grades_view(request, pk):
         exam_results_prof = ExamResult.objects.filter(course=obj)
 
         # Calculate grades for each student
-        student_grades = []
         for student in students:
             prelim_final, prelim_transmuted, prelim_classification = get_prelim_grades(student, obj)
             midterm_final, midterm_transmuted, midterm_classification = get_midterm_grades(student, obj)
             final_final, final_transmuted, final_classification = get_final_grades(student, obj)
 
-            total_final_grades = prelim_final + midterm_final + final_final
-            final_grade_average = total_final_grades / 3
+            # total_final_grades = prelim_final + midterm_final + final_final
+            # final_grade_average = total_final_grades / 3
 
             student_grades.append({
                 'student': student,
@@ -622,7 +632,6 @@ def grades_view(request, pk):
         total_final_grades = prelim_final + midterm_final + final_final
         final_grade_average = total_final_grades / 3
 
-
     # Pass context to the template, including the grades
     context = {
         'obj': obj,
@@ -647,13 +656,9 @@ def grades_view(request, pk):
         'final_classification': final_classification,
 
         'final_grade_average': final_grade_average,
-
     }
 
     return render(request, 'grades_view.html', context)
-
-
-
 
 
 
@@ -661,23 +666,23 @@ def get_transmuted_grade_and_classification(final_grade):
     """
     Maps a computed average to the corresponding transmuted grade and general classification.
     """
-    if 97.0000 <= final_grade <= 100.0000:
+    if 95.2 <= final_grade <= 100.0000:
         return 1.00, "Outstanding"
-    elif 94.0000 <= final_grade < 97.0000:
+    elif 90.4 <= final_grade < 95.1999:
         return 1.25, "Excellent"
-    elif 91.0000 <= final_grade < 94.0000:
+    elif 85.6 <= final_grade < 90.3999:
         return 1.50, "Superior"
-    elif 88.0000 <= final_grade < 91.0000:
+    elif 80.8 <= final_grade < 85.5999:
         return 1.75, "Very Good"
-    elif 85.0000 <= final_grade < 88.0000:
+    elif 76.0000 <= final_grade < 80.7999:
         return 2.00, "Good"
-    elif 82.0000 <= final_grade < 85.0000:
+    elif 71.2 <= final_grade < 75.9999:
         return 2.25, "Satisfactory"
-    elif 79.0000 <= final_grade < 82.0000:
+    elif 66.4 <= final_grade < 71.1999:
         return 2.50, "Fairly Satisfactory"
-    elif 76.0000 <= final_grade < 79.0000:
+    elif 61.6 <= final_grade < 66.3999:
         return 2.75, "Fair"
-    elif 75.0000 <= final_grade < 76.0000:
+    elif 60 <= final_grade < 61.5999:
         return 3.00, "Passed"
     else:
         return 5.00, "Failed"  # Assign 5.00 for failed grades below 75

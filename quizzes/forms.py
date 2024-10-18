@@ -7,14 +7,13 @@ from questions.models import Question, Answer
 class QuizForm(forms.ModelForm):
     class Meta:
         model = Quiz
-        fields = ['name', 'course', 'no_of_questions', 'req_score_to_pass', 'period', 'attempts_allowed', 'time_limit']
+        fields = ['name', 'course', 'no_of_questions', 'req_score_to_pass', 'period', 'time_limit']
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control'}),
             'course': forms.HiddenInput(),
             'no_of_questions': forms.NumberInput(attrs={'class': 'form-control'}),
             'req_score_to_pass': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'percentage'}),
             'period': forms.Select(choices=Quiz.PERIOD_CHOICES, attrs={'class': 'form-control'}),
-            'attempts_allowed': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Number of attempts allowed'}),
             'time_limit': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Time limit in minutes'}),
         }
     def __init__(self, *args, **kwargs):

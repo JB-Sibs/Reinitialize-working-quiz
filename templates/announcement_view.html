@@ -1,4 +1,3 @@
-{#{% extends 'taskbar.html' %}#}
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
@@ -20,21 +19,21 @@
     }
 
     .dashboard {
-      width: 250px; /* Taskbar width */
+      width: 250px;
       height: 100vh;
       background-color: #333;
       color: #fff;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
       padding: 0;
-      position: fixed; /* Fixing the sidebar */
+      position: fixed;
       top: 0;
       left: 0;
-      z-index: 1;
-      transition: margin-left 0.3s ease; /* Smooth transition for hiding */
+      z-index: 2;
+      transition: margin-left 0.3s ease;
     }
 
     .dashboard.hide {
-      margin-left: -250px; /* Move out of view when hidden */
+      margin-left: -250px;
     }
 
     .dashboard-header {
@@ -75,228 +74,282 @@
     }
 
     .dashboard-content a {
-      color: inherit; /* Inherit the dashboard text color */
-      text-decoration: none; /* No underline */
-      flex: 1; /* Allow links to fill space */
+      color: inherit;
+      text-decoration: none;
+      flex: 1;
     }
 
     .dashboard-content a:hover {
-      color: #D5A84C; /* Change color on hover */
+      color: #D5A84C;
     }
 
     .navbar {
-      background-color: transparent; /* Transparent navbar */
-      border: none; /* No border */
-      margin-top: auto; /* Push to bottom */
-      padding: 0; /* No padding */
+      background-color: transparent;
+      border: none;
+      margin-top: auto;
+      padding: 0;
     }
 
     .navbar.nav-item {
-      margin: 0 10px; /* Spacing between nav items */
+      margin: 0 10px;
     }
 
     .toggle-dashboard {
-      position: fixed; /* Fixed position */
-      top: 10px; /* Position from top */
-      left: calc(250px + 10px); /* Position next to dashboard */
-      z-index: 2; /* Above other elements */
-      background-color: #890604; /* Button color */
-      color: #FFFFFF; /* Text color */
-      border: none; /* No border */
-      font-size: 16px; /* Font size */
-      cursor: pointer; /* Pointer cursor on hover */
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      z-index: 3;
+      background-color: #890604;
+      color: #FFFFFF;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
     }
 
     .main-content {
-      margin-left: 250px; /* Push content to the right by taskbar width */
-      padding: 20px; /* Add padding for spacing */
-      height: calc(100vh - 20px); /* Full height minus padding for overflow handling */
-      overflow-y: auto; /* Enable scrolling if content is too long */
-      transition: margin-left 0.3s ease; /* Smooth transition for content area */
+      margin-left: 250px;
+      padding: 20px;
+      height: calc(100vh - 20px);
+      overflow-y: auto;
+      transition: margin-left 0.3s ease;
     }
 
     .main-content.shifted {
-        margin-left: 0; /* Remove margin when dashboard is hidden */
+      margin-left: 0;
     }
 
     @media (max-width: 767.98px) {
-        .dashboard {
-            width: 100%; 
-            height:auto; 
-            position:absolute; 
-            margin-left :0; 
-        }
-        .main-content {
-            margin-left :0 ; 
-            height:auto ; 
-        }
-        .toggle-dashboard {
-            left :10px ; 
-        }
-     }
-   </style>
+      .dashboard {
+        width: 100%;
+        height: auto;
+        position: absolute;
+        margin-left: 0;
+      }
+
+      .main-content {
+        margin-left: 0;
+        height: auto;
+      }
+
+      .toggle-dashboard {
+        left: 10px;
+      }
+    }
+
+    .content-container {
+      position: relative;
+      margin-top: 20px;
+    }
+
+    .custom-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .custom-btn:hover {
+      background-color: #0056b3;
+    }
+  </style>
 </head>
 <body>
- {% if user.is_student %}
- <button class="toggle-dashboard">Hide Dashboard</button> <!-- Button now says "Hide" by default -->
- <div class="dashboard">
-   <div class="dashboard-header">
-     <h2>Dashboard</h2>
-   </div>
-   <div class="dashboard-content">
-     <ul>
-       <li><a href="{% url 'class:home_view' %}">Courses</a></li>
-       {% if obj and obj.pk %}
-         <li><a href="{% url 'class:course_view' obj.pk %}">Home</a></li>
-         <li><a href="{% url 'class:announcement_view' obj.pk %}">Announcements</a></li>
-         <li><a href="{% url 'class:materials_view' obj.pk %}">Modules</a></li>
-         <li><a href="{% url 'class:activities_view' obj.pk %}">Activities / Quizzes</a></li>
-         <li><a href="{% url 'class:grades_view' obj.pk %}">Grades</a></li>
-       {% else %}
-         <span>
-           <li><a href="{% url 'class:all_announcements_view' %}">Announcements</a></li>
-           <li><a href="{% url 'class:all_materials_view' %}">Modules</a></li>
-         </span>
-       {% endif %}
-       <li><a href="{% url 'class:change_password' %}">Change Password</a></li>
-     </ul>
-     <nav class="navbar">
-       <ul class="navbar-nav ml-auto">
-         <li class="nav-item">
-           <a class="nav-link" href="{% url 'class:logout' %}">Logout</a>
-         </li>
-       </ul>
-     </nav>
-   </div>
- </div>
- {% endif %}
-
- {% if user.is_professor %}
- <button class="toggle-dashboard">Hide Dashboard</button> <!-- Button now says "Hide" by default -->
- <div class="dashboard">
-   <div class="dashboard-header">
-     <h2>Dashboard</h2>
-   </div>
-   <div class="dashboard-content">
-     <ul>
+  {% if user.is_student %}
+  <button class="toggle-dashboard">Hide Dashboard</button> <!-- Button now says "Hide" by default -->
+  <div class="dashboard">
+    <div class="dashboard-header">
+      <h2>Dashboard</h2>
+    </div>
+    <div class="dashboard-content">
+      <ul>
         <li><a href="{% url 'class:home_view' %}">Courses</a></li>
-                {% if obj and obj.pk %}
-                    <li>
-                    <a href="{% url 'class:course_view' obj.pk %}">Home</a>
-                    </li>
-                    <li><a href="{% url 'class:announcement_view' obj.pk %}">Announcements</a></li>
-                    <li><a href="{% url 'class:materials_view' obj.pk %}">Modules</a></li>
-                    <li><a href="{% url 'class:activities_view' obj.pk %}">Activities / Quizzes</a></li>
-                    <li><a href="{% url 'class:grades_view' obj.pk %}">Grades</a></li>
-                {% else %}
-                    <span>
-                        <li><a href="{% url 'class:all_announcements_view' %}">Announcements</a></li>
-                        <li><a href="{% url 'class:all_materials_view' %}">Modules</a></li>
-                    </span>
-                {% endif %}
-
+        {% if obj and obj.pk %}
+        <li><a href="{% url 'class:course_view' obj.pk %}">Home</a></li>
+        <li><a href="{% url 'class:announcement_view' obj.pk %}">Announcements</a></li>
+        <li><a href="{% url 'class:materials_view' obj.pk %}">Modules</a></li>
+        <li><a href="{% url 'class:activities_view' obj.pk %}">Activities / Quizzes</a></li>
+        <li><a href="{% url 'class:grades_view' obj.pk %}">Grades</a></li>
+        {% else %}
+        <span>
+          <li><a href="{% url 'class:all_announcements_view' %}">Announcements</a></li>
+          <li><a href="{% url 'class:all_materials_view' %}">Modules</a></li>
+        </span>
+        {% endif %}
         <li><a href="{% url 'class:change_password' %}">Change Password</a></li>
       </ul>
-     <nav class="navbar">
-       <ul class="navbar-nav ml-auto">
-         <li class="nav-item">
-           <a class="nav-link" href="{% url 'class:logout' %}">Logout</a> <!-- Adjust as necessary -->
-         </li>
-       </ul>
-     </nav>
-   </div>
- </div>
- {% endif %}
- 
- <!-- Inject content here for pages that extend this template -->
-<div class="main-content">
-   {% block content %}
-   <!-- Default content can be added here if needed -->
-   {% endblock %}
-</div>
+      <nav class="navbar">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'class:logout' %}">Logout</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+  {% endif %}
 
-{% block scripts %}
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script> <!-- Bootstrap JS -->
-<script>
-// Toggle dashboard visibility
-const toggleButton = document.querySelector('.toggle-dashboard');
-const dashboard = document.querySelector('.dashboard');
-const mainContent = document.querySelector('.main-content');
+  {% if user.is_admin %}
+  <button class="toggle-dashboard">Hide Dashboard</button>
+  <div class="dashboard">
+    <div class="dashboard-header">
+      <h2>Dashboard</h2>
+    </div>
+    <div class="dashboard-content">
+      <ul>
+        <li><a href="{% url 'class:admin_custom_view' %}">Courses</a></li>
+        {% if obj and obj.pk %}
+        <li><a href="{% url 'class:course_view' obj.pk %}">Home</a></li>
+        <li><a href="{% url 'class:announcement_view' obj.pk %}">Announcements</a></li>
+        <li><a href="{% url 'class:materials_view' obj.pk %}">Modules</a></li>
+        <li><a href="{% url 'class:activities_view' obj.pk %}">Activities / Quizzes</a></li>
+        <li><a href="{% url 'class:grades_view' obj.pk %}">Grades</a></li>
+        {% else %}
+        <span>
+          <li><a href="{% url 'class:all_announcements_view' %}">Announcements</a></li>
+          <li><a href="{% url 'class:all_materials_view' %}">Modules</a></li>
+        </span>
+        {% endif %}
+        <li><a href="{% url 'class:change_password' %}">Change Password</a></li>
+      </ul>
+      <nav class="navbar">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'class:logout' %}">Logout</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+  {% endif %}
 
-toggleButton.addEventListener('click', () => {
-   dashboard.classList.toggle('hide');
-   mainContent.classList.toggle('shifted'); // Adjust main content margin
+  {% if user.is_professor %}
+  <button class="toggle-dashboard">Hide Dashboard</button>
+  <div class="dashboard">
+    <div class="dashboard-header">
+      <h2>Dashboard</h2>
+    </div>
+    <div class="dashboard-content">
+      <ul>
+        <li><a href="{% url 'class:home_view' %}">Courses</a></li>
+        {% if obj and obj.pk %}
+        <li><a href="{% url 'class:course_view' obj.pk %}">Home</a></li>
+        <li><a href="{% url 'class:announcement_view' obj.pk %}">Announcements</a></li>
+        <li><a href="{% url 'class:materials_view' obj.pk %}">Modules</a></li>
+        <li><a href="{% url 'class:activities_view' obj.pk %}">Activities / Quizzes</a></li>
+        <li><a href="{% url 'class:grades_view' obj.pk %}">Grades</a></li>
+        {% else %}
+        <span>
+          <li><a href="{% url 'class:all_announcements_view' %}">Announcements</a></li>
+          <li><a href="{% url 'class:all_materials_view' %}">Modules</a></li>
+        </span>
+        {% endif %}
+        <li><a href="{% url 'class:change_password' %}">Change Password</a></li>
+      </ul>
+      <nav class="navbar">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'class:logout' %}">Logout</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+  {% endif %}
 
-   // Update the button text depending on the dashboard state
-   if (dashboard.classList.contains('hide')) {
-     toggleButton.textContent = 'Show Dashboard';
-   } else {
-     toggleButton.textContent = 'Hide Dashboard';
-   }
-});
-</script>
+  <!-- Main content area -->
+  <div class="main-content">
+    {% block content %}
+    <!-- Default content can be added here if needed -->
+    {% endblock %}
+  </div>
 
-{% endblock scripts %}
+  {% block scripts %}
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script> <!-- Bootstrap JS -->
+  <script>
+    // Toggle dashboard visibility
+    const toggleButton = document.querySelector('.toggle-dashboard');
+    const dashboard = document.querySelector('.dashboard');
+    const mainContent = document.querySelector('.main-content');
+
+    toggleButton.addEventListener('click', () => {
+      dashboard.classList.toggle('hide');
+      mainContent.classList.toggle('shifted'); // Adjust main content margin
+
+      // Update the button text depending on the dashboard state
+      if (dashboard.classList.contains('hide')) {
+        toggleButton.textContent = 'Show Dashboard';
+      } else {
+        toggleButton.textContent = 'Hide Dashboard';
+      }
+    });
+  </script>
+  {% endblock scripts %}
 </body>
 </html>
 
+<!-- CSS and additional scripts for announcement area -->
 {% load static %}
 <head>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="{% static 'profile.css' %}">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="{% static 'profile.css' %}">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 
 {% block inner_content %}
 <div class="content-container">
-    <h1>All Announcements</h1>
+  <h1>Announcements</h1>
 
-    <!-- Add Announcement Button for Professors -->
-    {% if user.is_professor %}
-        <a href="{% url 'class:add_announcement' obj.pk %}">
-            <button type="button" class="custom-btn">Add Announcement</button>
-        </a>
-    {% endif %}
+  <!-- Add Announcement Button for Professors -->
+  {% if user.is_professor %}
+    <a href="{% url 'class:add_announcement' obj.pk %}">
+      <button type="button" class="custom-btn">Add Announcement</button>
+    </a>
+  {% endif %}
 
-    <!-- Announcement Timeline -->
-    <div class="main-content">
-        <div class="timeline"> <!-- Announcement timeline style -->
-            <ul class="timeline">
-                {% for announcement in announcements %}
-                <li>
-                    <div class="timeline-time">
-                        <span class="date">{{ announcement.posted_on|date:"F d, Y" }}</span>
-                    </div>
-                    <div class="timeline-icon">
-                        <a href="#"></a> <!-- Placeholder for an icon if needed -->
-                    </div>
-                    <div class="timeline-body">
-                        <div class="timeline-header">
-                            <h3 class="timeline-title">{{ announcement.title }}</h3>
-                        </div>
-                        <div class="timeline-content">
-                            <p>{{ announcement.content }}</p>
-                        </div>
-                    </div>
-                </li>
-                {% empty %}
-                <li>No announcements available.</li>
-                {% endfor %}
-            </ul>
-        </div>
+  <!-- Announcement Timeline -->
+  <div class="main-content">
+    <div class="timeline"> <!-- Announcement timeline style -->
+      <ul class="timeline">
+        {% for announcement in announcements %}
+        <li>
+          <div class="timeline-time">
+            <span class="date">{{ announcement.posted_on|date:"F d, Y" }}</span>
+          </div>
+          <div class="timeline-icon">
+            <a href="#"></a> <!-- Placeholder for an icon if needed -->
+          </div>
+          <div class="timeline-body">
+            <div class="timeline-header">
+              <h3 class="timeline-title">{{ announcement.title }}</h3>
+            </div>
+            <div class="timeline-content">
+              <p>{{ announcement.content }}</p>
+            </div>
+          </div>
+        </li>
+        {% empty %}
+        <li>No announcements available.</li>
+        {% endfor %}
+      </ul>
     </div>
+  </div>
 </div>
 {% endblock inner_content %}
 <script>
-    function toggleModuleContent(headerElement) {
-        var content = headerElement.nextElementSibling;
-        var toggleIcon = headerElement.querySelector('.toggle-icon');
-        if (content.style.display === "block") {
-            content.style.display = "none";
-            toggleIcon.classList.add("collapsed");
-        } else {
-            content.style.display = "block";
-            toggleIcon.classList.remove("collapsed");
-        }
+  function toggleModuleContent(headerElement) {
+    var content = headerElement.nextElementSibling;
+    var toggleIcon = headerElement.querySelector('.toggle-icon');
+    if (content.style.display === "block") {
+      content.style.display = "none";
+      toggleIcon.classList.add("collapsed");
+    } else {
+      content.style.display = "block";
+      toggleIcon.classList.remove("collapsed");
     }
+  }
 </script>

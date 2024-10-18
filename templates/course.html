@@ -150,7 +150,6 @@
             <tr>
                 <th>Quiz Name</th>
                 <th>Score</th>
-                <th>Period</th> <!-- Add a column for the period -->
             </tr>
         </thead>
         <tbody>
@@ -158,7 +157,6 @@
             <tr>
                 <td>{{ result.quiz__name }}</td>
                 <td>{{ result.score }}</td>
-                <td>{{ result.period|capfirst }}</td> <!-- Show the period -->
             </tr>
             {% empty %}
             <tr>
@@ -367,3 +365,4 @@
 </div>
 
 {% endblock %}
+</div>

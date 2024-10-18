@@ -99,7 +99,7 @@
 
 <body>
     <div class="container">
-        <h1 class="question-header">Add Question {{ quiz.question_set.count }} of {{ quiz.no_of_questions }} for {{ quiz.name }}</h1>
+        <h1 class="question-header">Add Question {{ quiz.question_set.count|add:"1" }} of {{ quiz.no_of_questions }} for {{ quiz.name }}</h1>
         <form method="post">
             {% csrf_token %}
             {{ form.as_p }} <!-- Renders the form fields -->
