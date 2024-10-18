@@ -267,7 +267,7 @@ def login(request):
             return redirect('class:home_view')  # Redirect to the home view after successful login
         elif user is not None and user.is_professor:
             auth_login(request, user)
-            return redirect('class:professor_dashboard')
+            return redirect('class:home_view')
         elif user is not None and user.is_admin:
             auth_login(request, user)
             return redirect('class:admin_custom_view')
@@ -580,8 +580,7 @@ def grades_view(request, pk):
         students = [enrollment.user for enrollment in enrollments]
 
         # Fetch quiz and exam results for all students
-        results_prof = Grade.objects.filter(quiz__course=obj).values('user__username', 'quiz__name', 'score', 'passed',
-                                                                     'period')
+        results_prof = Grade.objects.filter(quiz__course=obj).values('user__username', 'quiz__name', 'score', 'passed', 'period')
         exam_results_prof = ExamResult.objects.filter(course=obj)
 
         # Calculate grades for each student
@@ -623,17 +622,39 @@ def grades_view(request, pk):
         total_final_grades = prelim_final + midterm_final + final_final
         final_grade_average = total_final_grades / 3
 
-        context = {
-            'obj': obj,
-            'results': results,
-            'exam_results': exam_results,
-            'prelim_final': prelim_final,
-            'midterm_final': midterm_final,
-            'final_final': final_final,
-            'final_grade_average': final_grade_average,
-        }
+
+    # Pass context to the template, including the grades
+    context = {
+        'obj': obj,
+        'results': results,  # Passing both the quiz name and score
+        'exam_results': exam_results,  # Passing the exam results to the template
+        'exam_results_prof': exam_results_prof,  # Passing the exam results to the template
+        'results_prof': results_prof,
+
+        # Prelim grade information
+        'prelim_final': prelim_final,
+        'prelim_transmuted': prelim_transmuted,
+        'prelim_classification': prelim_classification,
+
+        # Midterm grade information
+        'midterm_final': midterm_final,
+        'midterm_transmuted': midterm_transmuted,
+        'midterm_classification': midterm_classification,
+
+        # Final grade information
+        'final_final': final_final,
+        'final_transmuted': final_transmuted,
+        'final_classification': final_classification,
+
+        'final_grade_average': final_grade_average,
+
+    }
 
     return render(request, 'grades_view.html', context)
+
+
+
+
 
 
 def get_transmuted_grade_and_classification(final_grade):

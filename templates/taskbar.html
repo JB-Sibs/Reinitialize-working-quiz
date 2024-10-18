@@ -207,7 +207,7 @@
  </div>
  {% endif %}
  
- {% if user.is_professor %}
+ {% if user.is_professor or user.is_admin %}
  <button class="toggle-dashboard">Hide Dashboard</button> <!-- Button now says "Hide" by default -->
  <div class="dashboard">
    <div class="dashboard-header">
