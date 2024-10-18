@@ -94,7 +94,7 @@ def create_or_update_quiz_view(request, course_pk=None, quiz_pk=None):
     else:
         form = QuizForm(instance=quiz)
 
-    return render(request, 'crate_quiz.html', {'form': form})
+    return render(request, 'create_quiz.html', {'form': form})
 
 
 def save_quiz_view(request, course_pk, quiz_pk):

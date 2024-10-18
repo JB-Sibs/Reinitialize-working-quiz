@@ -12,7 +12,7 @@ class QuizForm(forms.ModelForm):
             'name': forms.TextInput(attrs={'class': 'form-control'}),
             'course': forms.HiddenInput(),
             'no_of_questions': forms.NumberInput(attrs={'class': 'form-control'}),
-            'req_score_to_pass': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'score to pass'}),
+            'req_score_to_pass': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'percentage'}),
             'period': forms.Select(choices=Quiz.PERIOD_CHOICES, attrs={'class': 'form-control'}),
             'attempts_allowed': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Number of attempts allowed'}),
             'time_limit': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Time limit in minutes'}),

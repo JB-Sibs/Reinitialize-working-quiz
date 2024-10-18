@@ -1,187 +1,5 @@
 {% extends 'taskbar.html' %}
 {% load static %}
-<style>
-    /* General Styles */
-    body {
-        font-family: 'Lato', sans-serif;
-        background-color: #f8f9fa;
-        color: #333;
-        margin: 0;
-        padding: 0;
-    }
-
-    /* Container Styles */
-    .container {
-        max-width: 1200px;
-        margin: 20px auto;
-        padding: 30px;
-        background-color: #fff;
-        border-radius: 8px;
-        border: 1px solid #e5e5e5;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-    }
-
-    /* Headings */
-    h2 {
-        font-size: 1.75rem;
-        color: #2c3e50;
-        font-weight: 600;
-        margin-bottom: 20px;
-        text-align: center;
-    }
-
-    /* Table Styles */
-    .table {
-        width: 100%;
-        border-collapse: separate;
-        border-spacing: 0 15px;
-        margin-bottom: 2rem;
-    }
-
-    .table th,
-    .table td {
-        padding: 15px;
-        text-align: left;
-    }
-
-    .table th {
-        background-color: #f5f7fa;
-        color: #34495e;
-        font-weight: 700;
-        border-bottom: 2px solid #e5e5e5;
-    }
-
-    .table td {
-        background-color: #fafafa;
-        border-bottom: 1px solid #e5e5e5;
-        font-size: 0.9rem;
-    }
-
-    .table tbody tr:hover td {
-        background-color: #f1f1f1;
-    }
-
-    /* Enhanced Button Styles */
-    .custom-btn {
-        background-color: #137cbd;
-        color: #fff;
-        padding: 12px 24px;
-        border-radius: 4px;
-        border: none;
-        font-size: 0.9rem;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        cursor: pointer;
-        transition: background-color 0.3s ease, transform 0.1s ease;
-    }
-
-    .custom-btn:hover {
-        background-color: #106ba3;
-        transform: translateY(-2px);
-    }
-
-    .custom-btn:active {
-        transform: translateY(1px);
-    }
-
-    .custom-btn:focus {
-        outline: none;
-        box-shadow: 0 0 0 3px rgba(19, 124, 189, 0.5);
-    }
-
-    /* Text Alignment and Spacing */
-    .text-center {
-        text-align: center;
-    }
-
-    .mt-3 {
-        margin-top: 1rem;
-    }
-
-    .mt-4 {
-        margin-top: 1.5rem;
-    }
-
-    /* Card Styles for Grades Section */
-    .grades-card {
-        padding: 20px;
-        background-color: #fefefe;
-        border: 1px solid #e1e1e1;
-        border-radius: 8px;
-        margin-bottom: 20px;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-    }
-
-    .grades-card h3 {
-        font-size: 1.25rem;
-        color: #2980b9;
-        font-weight: 600;
-        margin-bottom: 15px;
-        text-align: center;
-    }
-
-    .grades-card p {
-        font-size: 1rem;
-        color: #34495e;
-        margin-bottom: 5px;
-    }
-
-    .grades-card p strong {
-        font-weight: 700;
-    }
-
-    /* Tooltip for info */
-    .tooltip-btn {
-        position: relative;
-        cursor: pointer;
-        color: #3498db;
-        text-decoration: underline;
-    }
-
-    .tooltip-btn:hover::after {
-        content: attr(data-tooltip);
-        position: absolute;
-        top: -35px;
-        left: 50%;
-        transform: translateX(-50%);
-        background-color: #333;
-        color: #fff;
-        padding: 8px 10px;
-        font-size: 0.85rem;
-        border-radius: 4px;
-        white-space: nowrap;
-        z-index: 10;
-        opacity: 1;
-    }
-
-    .tooltip-btn:hover::before {
-        content: '';
-        position: absolute;
-        top: -10px;
-        left: 50%;
-        transform: translateX(-50%);
-        border-width: 5px;
-        border-style: solid;
-        border-color: transparent transparent #333 transparent;
-        z-index: 10;
-    }
-
-    /* Responsiveness */
-    @media (max-width: 768px) {
-        .container {
-            padding: 20px;
-        }
-
-        .table th, .table td {
-            padding: 10px;
-        }
-
-        .custom-btn {
-            font-size: 0.8rem;
-        }
-    }
-</style>
 
 <div class="main-content">
     {% block content %}
@@ -189,26 +7,26 @@
         <!-- Student View -->
         {% if user.is_student %}
         <h2>Quiz Scores</h2>
-<table class="table table-bordered mt-3">
-    <thead>
-        <tr>
-            <th>Quiz Name</th>
-            <th>Score</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for result in results %}
-        <tr>
-            <td>{{ result.quiz__name }}</td>
-            <td>{{ result.score }}</td>
-        </tr>
-        {% empty %}
-        <tr>
-            <td colspan="3" class="text-center">No quiz results available.</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+        <table class="table table-bordered mt-3">
+            <thead>
+                <tr>
+                    <th>Quiz Name</th>
+                    <th>Score</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for result in results %}
+                <tr>
+                    <td>{{ result.quiz__name }}</td>
+                    <td>{{ result.score }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="2" class="text-center">No quiz results available.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
 
         <h2>Exam Scores</h2>
         <table class="table table-bordered mt-3">
@@ -238,7 +56,7 @@
         {% endif %}
 
         <!-- Professor View -->
-        {% if user.is_professor or user.is_admin %}
+        {% if user.is_professor %}
         <h2>Quiz Scores (All Students)</h2>
         <table class="table table-bordered mt-3">
             <thead>
@@ -293,114 +111,40 @@
             </tbody>
         </table>
 
-        <div class="text-center mt-3">
-            <a href="{% url 'class:add_exam_result' obj.pk %}">
-                <button type="button" class="custom-btn">Add Exam Results</button>
-            </a>
-        </div>
-        {% endif %}
-
-        {% if user.is_student %}
-        <!-- Prelim, Midterm, Final Grades -->
-        {% if prelim_final or prelim_transmuted or prelim_classification %}
-        <div class="grades-card">
-            <h3>Prelim Grades</h3>
-            {% if prelim_final %}<p><strong>Final Grade:</strong> {{ prelim_final|floatformat:"2" }}</p>{% endif %}
-            {% if prelim_transmuted %}<p><strong>Transmuted Grade:</strong> {{ prelim_transmuted|floatformat:"2" }}</p>{% endif %}
-            {% if prelim_classification %}<p><strong>Classification:</strong> {{ prelim_classification }}</p>{% endif %}
-        </div>
-        {% endif %}
-
-        {% if midterm_final or midterm_transmuted or midterm_classification %}
-        <div class="grades-card">
-            <h3>Midterm Grades</h3>
-            {% if midterm_final %}<p><strong>Final Grade:</strong> {{ midterm_final|floatformat:"2" }}</p>{% endif %}
-            {% if midterm_transmuted %}<p><strong>Transmuted Grade:</strong> {{ midterm_transmuted|floatformat:"2" }}</p>{% endif %}
-            {% if midterm_classification %}<p><strong>Classification:</strong> {{ midterm_classification }}</p>{% endif %}
-        </div>
-        {% endif %}
-
-        {% if final_final or final_transmuted or final_classification %}
-        <div class="grades-card">
-            <h3>Final Grades</h3>
-            {% if final_final %}<p><strong>Final Grade:</strong> {{ final_final|floatformat:"2" }}</p>{% endif %}
-            {% if final_transmuted %}<p><strong>Transmuted Grade:</strong> {{ final_transmuted|floatformat:"2" }}</p>{% endif %}
-            {% if final_classification %}<p><strong>Classification:</strong> {{ final_classification }}</p>{% endif %}
-        </div>
-            
-            <div class="grades-card">
-            <h2>Final Computation of Grades: {{ final_grade_average|floatformat:"2" }}</h2>
-<h2>Transmuted Grade: 
-    {% if final_grade_average >= 95.2000 %}
-        1.00 (Outstanding)
-    {% elif final_grade_average >= 90.4000 and final_grade_average < 95.2000 %}
-        1.25 (Excellent)
-    {% elif final_grade_average >= 85.6000 and final_grade_average < 90.4000 %}
-        1.50 (Superior)
-    {% elif final_grade_average >= 80.8000 and final_grade_average < 85.6000 %}
-        1.75 (Very Good)
-    {% elif final_grade_average >= 76.0000 and final_grade_average < 80.8000 %}
-        2.00 (Good)
-    {% elif final_grade_average >= 71.2000 and final_grade_average < 76.0000 %}
-        2.25 (Satisfactory)
-    {% elif final_grade_average >= 66.4000 and final_grade_average < 71.2000 %}
-        2.50 (Fairly Satisfactory)
-    {% elif final_grade_average >= 61.6000 and final_grade_average < 66.4000 %}
-        2.75 (Fair)
-    {% elif final_grade_average >= 60.0000 and final_grade_average < 61.6000 %}
-        3.00 (Passed)
-    {% else %}
-        5.00 (Failed)
-    {% endif %}
-</h2>
-
-
-        </div>
-        {% endif %}
-        {% endif %}
-    {% if user.is_professor %}
-<div class="grades-card">
+        <!-- Student Grades Overview (Professors) -->
+      <div class="grades-card">
     <h3>Student Grades Overview</h3>
-    {% for student, grades in student_grades.items %}
-
-        {% comment %} Check if the current user is a professor and skip grades display {% endcomment %}
-        {% if not student == user.username %} 
-                    <h4>{{ student }}</h4>
-<!-- Check if the student is not the current user -->
-            {% if grades.prelim_final or grades.prelim_transmuted or grades.prelim_classification %}
-            <div>
-                <h5>Prelim Grades</h5>
-                {% if grades.prelim_final %}<p><strong>Final Grade:</strong> {{ grades.prelim_final|floatformat:"2" }}</p>{% endif %}
-                {% if grades.prelim_transmuted %}<p><strong>Transmuted Grade:</strong> {{ grades.prelim_transmuted|floatformat:"2" }}</p>{% endif %}
-                {% if grades.prelim_classification %}<p><strong>Classification:</strong> {{ grades.prelim_classification }}</p>{% endif %}
-            </div>
-            {% endif %}
-
-            {% if grades.midterm_final or grades.midterm_transmuted or grades.midterm_classification %}
-            <div>
-                <h5>Midterm Grades</h5>
-                {% if grades.midterm_final %}<p><strong>Final Grade:</strong> {{ grades.midterm_final|floatformat:"2" }}</p>{% endif %}
-                {% if grades.midterm_transmuted %}<p><strong>Transmuted Grade:</strong> {{ grades.midterm_transmuted|floatformat:"2" }}</p>{% endif %}
-                {% if grades.midterm_classification %}<p><strong>Classification:</strong> {{ grades.midterm_classification }}</p>{% endif %}
-            </div>
-            {% endif %}
-
-            {% if grades.final_final or grades.final_transmuted or grades.final_classification %}
-            <div>
-                <h5>Final Grades</h5>
-                {% if grades.final_final %}<p><strong>Final Grade:</strong> {{ grades.final_final|floatformat:"2" }}</p>{% endif %}
-                {% if grades.final_transmuted %}<p><strong>Transmuted Grade:</strong> {{ grades.final_transmuted|floatformat:"2" }}</p>{% endif %}
-                {% if grades.final_classification %}<p><strong>Classification:</strong>{{ grades.final_classification }}</p>{% endif %}
-            
-            </div>
-                
-            {% endif %}
-        {% else %}
-        {% endif %}
-        
-    {% endfor %}
+    <table class="table table-bordered mt-3">
+        <thead>
+            <tr>
+                <th>Student Name</th>
+                <th>Prelim Grade</th>
+                <th>Midterm Grade</th>
+                <th>Final Grade</th>
+                <th>Average</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for grade in student_grades %}
+                <!-- Avoid showing professor's own grades -->
+                {% if not grade.student.username == user.username %}
+                <tr>
+                    <td>{{ grade.student.username }}</td>
+                    <td>{{ grade.prelim_final|floatformat:"2" }}</td>
+                    <td>{{ grade.midterm_final|floatformat:"2" }}</td>
+                    <td>{{ grade.final_final|floatformat:"2" }}</td>
+                    <td>{{ grade.final_grade_average|floatformat:"2" }}</td>
+                </tr>
+                {% endif %}
+            {% empty %}
+            <tr>
+                <td colspan="5" class="text-center">No grades available for students.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
-{% endif %}
+        {% endif %}
     </div>
     {% endblock %}
 </div>

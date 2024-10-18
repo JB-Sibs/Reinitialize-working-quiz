@@ -573,56 +573,67 @@ def grades_view(request, pk):
     # Fetch the course object based on the primary key
     obj = Course.objects.get(pk=pk)
 
-    # Fetch exam results for the current user and course
-    exam_results = ExamResult.objects.filter(course=obj, student=request.user)
-    exam_results_prof = ExamResult.objects.filter(course=obj)
+    # Check if the user is a professor
+    if request.user.is_professor:
+        # Fetch all students enrolled in this course
+        enrollments = Enrollment.objects.filter(course=obj)
+        students = [enrollment.user for enrollment in enrollments]
 
-    # Filter grades for quizzes related to this course, and get the quiz name and score
-    results = Grade.objects.filter(quiz__course=obj, user=request.user).values('quiz__name', 'score', 'period')
-    results_prof = Grade.objects.filter(quiz__course=obj).values('user__username', 'quiz__name', 'score', 'passed', 'period')
+        # Fetch quiz and exam results for all students
+        results_prof = Grade.objects.filter(quiz__course=obj).values('user__username', 'quiz__name', 'score', 'passed',
+                                                                     'period')
+        exam_results_prof = ExamResult.objects.filter(course=obj)
 
-    # Get grades filtered by period for the logged-in user, passing the course object
-    prelim_final, prelim_transmuted, prelim_classification = get_prelim_grades(user=request.user, course=obj)
-    midterm_final, midterm_transmuted, midterm_classification = get_midterm_grades(user=request.user, course=obj)
-    final_final, final_transmuted, final_classification = get_final_grades(user=request.user, course=obj)
+        # Calculate grades for each student
+        student_grades = []
+        for student in students:
+            prelim_final, prelim_transmuted, prelim_classification = get_prelim_grades(student, obj)
+            midterm_final, midterm_transmuted, midterm_classification = get_midterm_grades(student, obj)
+            final_final, final_transmuted, final_classification = get_final_grades(student, obj)
 
-    # Calculate the average final grade
-    total_final_grades = prelim_final + midterm_final + final_final
-    final_grade_average = total_final_grades / 3
+            total_final_grades = prelim_final + midterm_final + final_final
+            final_grade_average = total_final_grades / 3
 
+            student_grades.append({
+                'student': student,
+                'prelim_final': prelim_final,
+                'midterm_final': midterm_final,
+                'final_final': final_final,
+                'final_grade_average': final_grade_average
+            })
 
-    # Pass context to the template, including the grades
-    context = {
-        'obj': obj,
-        'results': results,  # Passing both the quiz name and score
-        'exam_results': exam_results,  # Passing the exam results to the template
-        'exam_results_prof': exam_results_prof,  # Passing the exam results to the template
-        'results_prof': results_prof,
+        context = {
+            'obj': obj,
+            'students': students,
+            'student_grades': student_grades,
+            'exam_results_prof': exam_results_prof,  # Exam results for professor's view
+            'results_prof': results_prof,  # Quiz results for professor's view
+        }
 
-        # Prelim grade information
-        'prelim_final': prelim_final,
-        'prelim_transmuted': prelim_transmuted,
-        'prelim_classification': prelim_classification,
+    else:
+        # Fetch grades for the logged-in student
+        exam_results = ExamResult.objects.filter(course=obj, student=request.user)
+        results = Grade.objects.filter(quiz__course=obj, user=request.user).values('quiz__name', 'score', 'period')
 
-        # Midterm grade information
-        'midterm_final': midterm_final,
-        'midterm_transmuted': midterm_transmuted,
-        'midterm_classification': midterm_classification,
+        # Calculate logged-in student's grades
+        prelim_final, prelim_transmuted, prelim_classification = get_prelim_grades(user=request.user, course=obj)
+        midterm_final, midterm_transmuted, midterm_classification = get_midterm_grades(user=request.user, course=obj)
+        final_final, final_transmuted, final_classification = get_final_grades(user=request.user, course=obj)
 
-        # Final grade information
-        'final_final': final_final,
-        'final_transmuted': final_transmuted,
-        'final_classification': final_classification,
+        total_final_grades = prelim_final + midterm_final + final_final
+        final_grade_average = total_final_grades / 3
 
-        'final_grade_average': final_grade_average,
-
-    }
+        context = {
+            'obj': obj,
+            'results': results,
+            'exam_results': exam_results,
+            'prelim_final': prelim_final,
+            'midterm_final': midterm_final,
+            'final_final': final_final,
+            'final_grade_average': final_grade_average,
+        }
 
     return render(request, 'grades_view.html', context)
-
-
-
-
 
 
 def get_transmuted_grade_and_classification(final_grade):
